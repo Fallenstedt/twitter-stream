@@ -1,0 +1,72 @@
+package twitstream
+
+import (
+	"bytes"
+	"errors"
+	"io/ioutil"
+	"log"
+	"net/http"
+)
+
+var endpoints = make(map[string]string)
+
+type (
+	IHttpClient interface {
+		newHttpRequest(opts *requestOpts) (*http.Response, error)
+	}
+
+	httpClient struct {
+		token string
+	}
+
+	requestOpts struct {
+		Method string
+		Url    string
+		Body   string
+	}
+)
+
+// newHttpClient creates an http client which makes authenticated requests to twitter using a bearer token
+func newHttpClient(token string) *httpClient {
+	endpoints["rules"] = "https://api.twitter.com/2/tweets/search/stream/rules"
+	endpoints["stream"] = "https://api.twitter.com/2/tweets/search/stream"
+	return &httpClient{token}
+}
+
+func (t *httpClient) newHttpRequest(opts *requestOpts) (*http.Response, error) {
+	client := &http.Client{}
+
+	var req *http.Request
+	var err error
+	if opts.Method == "GET" {
+		req, err = http.NewRequest(opts.Method, opts.Url, nil)
+	} else {
+		bufferBody := bytes.NewBuffer([]byte(opts.Body))
+		req, err = http.NewRequest(opts.Method, opts.Url, bufferBody)
+	}
+
+	if err != nil {
+		log.Printf("Failed to construct http request for %s: %v", opts.Url, err)
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	if len(t.token) > 0 {
+		req.Header.Add("Authorization", "Bearer "+t.token)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Failed to perform request for %s: %v", opts.Url, err)
+		return nil, err
+	}
+
+	if resp.StatusCode >= 400 {
+		log.Printf("Network Request failed: %v", resp.StatusCode)
+		body, _ := ioutil.ReadAll(resp.Body)
+		msg := "Network request failed: " + string(body)
+		return nil, errors.New(msg)
+	}
+
+	return resp, nil
+}
