@@ -123,7 +123,7 @@ func getRules() {
 	// With an access token, you can create a new twitstream and start getting your rules
 	api := twitstream.NewTwitterStream(token.AccessToken)
 
-	// You can get your rules by passing in stringified JSON with the rules you want to delete
+	// You can get your rules by invoking GetRules
 	// Learn more about getting rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
 	res, err := api.Rules.GetRules()
 
