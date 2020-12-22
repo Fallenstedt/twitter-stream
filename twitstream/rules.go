@@ -85,7 +85,7 @@ func (t *rules) GetRules() (*getRulesResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-fmt.Println('test')
+fmt.Println("test")
 	defer res.Body.Close()
 	data := new(getRulesResponse)
 	json.NewDecoder(res.Body).Decode(data)
