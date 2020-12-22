@@ -11,12 +11,12 @@ import (
 func TestAddRules(t *testing.T) {
 
 	var tests = []struct {
-		body string
+		body        string
 		mockRequest func(opts *requestOpts) (*http.Response, error)
-		result *addRulesResponse
-	} {
+		result      *addRulesResponse
+	}{
 		{
-	`{
+			`{
 				"add": [
 					{"value": "cat has:images", "tag": "cat tweets with images"}
 				]
@@ -40,12 +40,12 @@ func TestAddRules(t *testing.T) {
 				body := ioutil.NopCloser(bytes.NewReader([]byte(json)))
 				return &http.Response{
 					StatusCode: http.StatusOK,
-					Body: body,
+					Body:       body,
 				}, nil
 
 			},
 			&addRulesResponse{
-				Data: []rulesResponseValue {
+				Data: []rulesResponseValue{
 					{
 						Value: "cat has:images",
 						Tag:   "cat tweets with images",
@@ -53,9 +53,9 @@ func TestAddRules(t *testing.T) {
 					},
 				},
 				Meta: rulesResponseMeta{
-					Sent:    "today",
+					Sent: "today",
 					Summary: addRulesResponseMetaSummary{
-						Created: 1,
+						Created:    1,
 						NotCreated: 0,
 					},
 				},

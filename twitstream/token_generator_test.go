@@ -10,9 +10,9 @@ import (
 
 func TestSetApiKeyAndSecret(t *testing.T) {
 	var tests = []struct {
-		apiKey string
+		apiKey    string
 		apiSecret string
-		result tokenGenerator
+		result    tokenGenerator
 	}{
 		{"foo", "bar", tokenGenerator{apiKey: "foo", apiSecret: "bar"}},
 		{"", "", tokenGenerator{apiKey: "", apiSecret: ""}},
@@ -38,7 +38,7 @@ func TestSetApiKeyAndSecret(t *testing.T) {
 func TestRequestBearerToken(t *testing.T) {
 	var tests = []struct {
 		mockRequest func(opts *requestOpts) (*http.Response, error)
-		result *requestBearerTokenResponse
+		result      *requestBearerTokenResponse
 	}{
 		{func(opts *requestOpts) (*http.Response, error) {
 
@@ -51,15 +51,14 @@ func TestRequestBearerToken(t *testing.T) {
 
 			return &http.Response{
 				StatusCode: http.StatusOK,
-				Body: body,
+				Body:       body,
 			}, nil
 		},
-		&requestBearerTokenResponse{
-			TokenType: "bearer",
-			AccessToken: "123Token456",
-		}},
+			&requestBearerTokenResponse{
+				TokenType:   "bearer",
+				AccessToken: "123Token456",
+			}},
 	}
-
 
 	for i, tt := range tests {
 		testName := fmt.Sprintf("(%d)", i)

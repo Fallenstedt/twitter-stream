@@ -14,15 +14,14 @@ type (
 	}
 	tokenGenerator struct {
 		httpClient IHttpClient
-		apiKey    string
-		apiSecret string
+		apiKey     string
+		apiSecret  string
 	}
 	requestBearerTokenResponse struct {
 		TokenType   string `json:"token_type"`
 		AccessToken string `json:"access_token"`
 	}
 )
-
 
 func newTokenGenerator(httpClient IHttpClient) *tokenGenerator {
 	return &tokenGenerator{httpClient: httpClient}
@@ -40,15 +39,15 @@ func (a *tokenGenerator) RequestBearerToken() *requestBearerTokenResponse {
 
 	resp, err := a.httpClient.newHttpRequest(&requestOpts{
 		Headers: []struct {
-			key string
+			key   string
 			value string
-		} {
+		}{
 			{"Content-Type", "application/x-www-form-urlencoded;charset=UTF-8"},
-			{ "Authorization", "Basic "+a.base64EncodeKeys()},
+			{"Authorization", "Basic " + a.base64EncodeKeys()},
 		},
 		Method: "POST",
-		Url: endpoints["token"],
-		Body: "grant_type=client_credentials",
+		Url:    endpoints["token"],
+		Body:   "grant_type=client_credentials",
 	})
 
 	if err != nil {

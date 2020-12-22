@@ -20,11 +20,11 @@ type (
 	}
 
 	requestOpts struct {
-		Method string
-		Url    string
-		Body   string
+		Method  string
+		Url     string
+		Body    string
 		Headers []struct {
-			key string
+			key   string
 			value string
 		}
 	}
