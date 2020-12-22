@@ -6,7 +6,8 @@ type twitterApi struct {
 }
 
 func NewTokenGenerator() *tokenGenerator {
-	tokenGenerator := newTokenGenerator()
+	client := newHttpClient("")
+	tokenGenerator := newTokenGenerator(client)
 	return tokenGenerator
 }
 
