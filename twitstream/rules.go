@@ -5,6 +5,7 @@ import (
 )
 
 type (
+	//IRules is the interface the rules struct implements
 	IRules interface {
 		AddRules(body string, dryRun bool) (*addRulesResponse, error)
 		GetRules() (*getRulesResponse, error)

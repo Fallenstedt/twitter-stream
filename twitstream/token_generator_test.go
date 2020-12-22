@@ -73,7 +73,6 @@ func TestRequestBearerToken(t *testing.T) {
 
 			data := instance.RequestBearerToken()
 
-			t.Log(data)
 			if data == nil {
 				t.Errorf("got %s, want %s", data, tt.result)
 			}

@@ -68,7 +68,6 @@ func (t *httpClient) newHttpRequest(opts *requestOpts) (*http.Response, error) {
 		req.Header.Set("Authorization", "Bearer "+t.token)
 	}
 
-
 	// Perform network request
 	resp, err := client.Do(req)
 	if err != nil {
