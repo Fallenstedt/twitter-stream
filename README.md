@@ -4,6 +4,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/fallenstedt/twitter-stream)](https://goreportcard.com/report/github.com/fallenstedt/twitter-stream)
 
+
 TwitStream is a Go library for streaming tweets with [Twitter's v2 Filtered Streaming API](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/introduction).
 
 ![example of twit stream](./example.gif)

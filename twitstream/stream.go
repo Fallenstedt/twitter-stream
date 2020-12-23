@@ -6,6 +6,7 @@ import (
 )
 
 type (
+	//IStream
 	IStream interface {
 		StartStream()
 		StopStream()
@@ -13,7 +14,7 @@ type (
 	}
 
 	stream struct {
-		Messages   chan interface{}
+		messages   chan interface{}
 		httpClient IHttpClient
 		done       chan struct{}
 		group      *sync.WaitGroup
@@ -23,7 +24,7 @@ type (
 
 func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream {
 	return &stream{
-		Messages:   make(chan interface{}),
+		messages:   make(chan interface{}),
 		done:       make(chan struct{}),
 		group:      new(sync.WaitGroup),
 		reader:     reader,
@@ -32,7 +33,7 @@ func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream
 }
 
 func (s *stream) GetMessages() *chan interface{} {
-	return &s.Messages
+	return &s.messages
 }
 
 // StopStream sends a close signal to stop the stream of tweets
@@ -73,6 +74,6 @@ func (s *stream) streamMessages(res *http.Response) {
 
 		m := string(data)
 		// TODO send data or error here
-		s.Messages <- m
+		s.messages <- m
 	}
 }

@@ -7,20 +7,15 @@ import (
 type (
 	//IRules is the interface the rules struct implements
 	IRules interface {
-		AddRules(body string, dryRun bool) (*addRulesResponse, error)
-		GetRules() (*getRulesResponse, error)
+		AddRules(body string, dryRun bool) (*rulesResponse, error)
+		GetRules() (*rulesResponse, error)
 	}
 
 	rules struct {
 		httpClient IHttpClient
 	}
 
-	getRulesResponse struct {
-		Data []rulesResponseValue
-		Meta rulesResponseMeta
-	}
-
-	addRulesResponse struct {
+	rulesResponse struct {
 		Data []rulesResponseValue
 		Meta rulesResponseMeta
 	}
@@ -46,7 +41,7 @@ func newRules(httpClient IHttpClient) *rules {
 
 // AddRules adds rules to the stream. body is stringified object:
 // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/post-tweets-search-stream-rules
-func (t *rules) AddRules(body string, dryRun bool) (*addRulesResponse, error) {
+func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 
 	var url string
 	if dryRun {
@@ -66,7 +61,7 @@ func (t *rules) AddRules(body string, dryRun bool) (*addRulesResponse, error) {
 	}
 
 	defer res.Body.Close()
-	data := new(addRulesResponse)
+	data := new(rulesResponse)
 	json.NewDecoder(res.Body).Decode(data)
 
 	return data, nil
@@ -74,7 +69,7 @@ func (t *rules) AddRules(body string, dryRun bool) (*addRulesResponse, error) {
 
 // GetRules gets rules for a stream.
 // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
-func (t *rules) GetRules() (*getRulesResponse, error) {
+func (t *rules) GetRules() (*rulesResponse, error) {
 	res, err := t.httpClient.newHttpRequest(&requestOpts{
 		Method: "GET",
 		Url:    endpoints["rules"],
@@ -86,7 +81,7 @@ func (t *rules) GetRules() (*getRulesResponse, error) {
 	}
 
 	defer res.Body.Close()
-	data := new(getRulesResponse)
+	data := new(rulesResponse)
 	json.NewDecoder(res.Body).Decode(data)
 
 	return data, nil
