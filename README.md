@@ -11,8 +11,6 @@ TwitStream is a Go library for streaming tweets with [Twitter's v2 Filtered Stre
 
 This project is not production ready. There are several things I need to do: 
 - [ ] This package streams strings. I need to convert json into go structs with [these possible response fields](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream)  
-- [ ] This package needs tests
-- [ ] This package needs a complete readme
 
 ## Examples
 
