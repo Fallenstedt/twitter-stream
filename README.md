@@ -23,12 +23,12 @@ func startStreaming() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
@@ -59,12 +59,12 @@ func addRules() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
@@ -93,12 +93,12 @@ func deleteRules() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
@@ -127,12 +127,12 @@ func getRules() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
