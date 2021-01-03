@@ -15,7 +15,7 @@ This project is not production ready. There are several things I need to do:
 
 ## Installation
 
-`go get github.com/Fallenstedt/tw`
+`go get github.com/fallenstedt/twitter-stream`
 
 
 ## Examples
