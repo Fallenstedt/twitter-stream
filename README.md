@@ -1,4 +1,4 @@
-# TwitStream
+# TwitterStream
 
 ![go twitter](./go-twitter.png)
 
@@ -157,10 +157,6 @@ func getRules() {
 }
 
 ```
-
-
-
-## Usage
 
 
 
