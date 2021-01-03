@@ -37,6 +37,7 @@ func sleepOrDone(d time.Duration, done <-chan struct{}) {
 }
 
 type (
+	// IStreamResponseBodyReader is the interface the streamResponseBodyReader implements.
 	IStreamResponseBodyReader interface {
 		readNext() ([]byte, error)
 		setStreamResponseBody(body io.Reader)
