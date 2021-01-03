@@ -11,6 +11,7 @@ import (
 var endpoints = make(map[string]string)
 
 type (
+	// IHttpClient is the interface the httpClient struct implements.
 	IHttpClient interface {
 		newHttpRequest(opts *requestOpts) (*http.Response, error)
 	}
@@ -30,7 +31,7 @@ type (
 	}
 )
 
-// newHttpClient creates an http client which makes authenticated requests to twitter using a bearer token
+
 func newHttpClient(token string) *httpClient {
 	endpoints["rules"] = "https://api.twitter.com/2/tweets/search/stream/rules"
 	endpoints["stream"] = "https://api.twitter.com/2/tweets/search/stream"

@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	//IRules is the interface the rules struct implements
+	//IRules is the interface the rules struct implements.
 	IRules interface {
 		AddRules(body string, dryRun bool) (*rulesResponse, error)
 		GetRules() (*rulesResponse, error)
@@ -39,8 +39,8 @@ func newRules(httpClient IHttpClient) *rules {
 	return &rules{httpClient: httpClient}
 }
 
-// AddRules adds rules to the stream. body is stringified object:
-// https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/post-tweets-search-stream-rules
+// AddRules adds or deletes rules to the stream using twitter's POST /2/tweets/search/stream/rules endpoint.
+// The body is a stringified object.
 func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 
 	var url string
@@ -67,8 +67,7 @@ func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 	return data, nil
 }
 
-// GetRules gets rules for a stream.
-// https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
+// GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
 func (t *rules) GetRules() (*rulesResponse, error) {
 	res, err := t.httpClient.newHttpRequest(&requestOpts{
 		Method: "GET",

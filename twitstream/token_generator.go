@@ -3,11 +3,10 @@ package twitstream
 import (
 	"encoding/base64"
 	"encoding/json"
-	"log"
 )
 
 type (
-	//ITokenGenerator is the interface that tokenGenerator implements
+	//ITokenGenerator is the interface that tokenGenerator implements.
 	ITokenGenerator interface {
 		RequestBearerToken() *requestBearerTokenResponse
 		SetApiKeyAndSecret(apiKey, apiSecret string) *tokenGenerator
@@ -27,15 +26,15 @@ func newTokenGenerator(httpClient IHttpClient) *tokenGenerator {
 	return &tokenGenerator{httpClient: httpClient}
 }
 
-// SetApiKeyAndSecret sets the apiLey and apiSecret fields for the instance
+// SetApiKeyAndSecret sets the apiKey and apiSecret fields for the tokenGenerator instance.
 func (a *tokenGenerator) SetApiKeyAndSecret(apiKey, apiSecret string) *tokenGenerator {
 	a.apiKey = apiKey
 	a.apiSecret = apiSecret
 	return a
 }
 
-// RequestBearerToken requests a bearer token from twitter using the apiKey and apiSecret
-func (a *tokenGenerator) RequestBearerToken() *requestBearerTokenResponse {
+// RequestBearerToken requests a bearer token from twitter using the apiKey and apiSecret.
+func (a *tokenGenerator) RequestBearerToken() (*requestBearerTokenResponse, error) {
 
 	resp, err := a.httpClient.newHttpRequest(&requestOpts{
 		Headers: []struct {
@@ -51,15 +50,14 @@ func (a *tokenGenerator) RequestBearerToken() *requestBearerTokenResponse {
 	})
 
 	if err != nil {
-		log.Fatalf("Failed to construct request for bearer token: %v", err)
-		return nil
+		return nil, err
 	}
 
 	defer resp.Body.Close()
 	data := new(requestBearerTokenResponse)
 	json.NewDecoder(resp.Body).Decode(data)
 
-	return data
+	return data, nil
 }
 
 func (a *tokenGenerator) base64EncodeKeys() string {
