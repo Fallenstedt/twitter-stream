@@ -1,4 +1,4 @@
-package twitstream
+package twitter_stream
 
 //
 // ❤️ Credit goes to the team at dghubble/go-twitter who originally built this code.
@@ -37,6 +37,7 @@ func sleepOrDone(d time.Duration, done <-chan struct{}) {
 }
 
 type (
+	// IStreamResponseBodyReader is the interface the streamResponseBodyReader implements.
 	IStreamResponseBodyReader interface {
 		readNext() ([]byte, error)
 		setStreamResponseBody(body io.Reader)

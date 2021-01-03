@@ -1,4 +1,4 @@
-package twitstream
+package twitter_stream
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	//IStream
+	// IStream is the interface that the stream struct implements.
 	IStream interface {
 		StartStream()
 		StopStream()
@@ -32,15 +32,17 @@ func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream
 	}
 }
 
+// GetMessages returns the messages channel.
 func (s *stream) GetMessages() *chan interface{} {
 	return &s.messages
 }
 
-// StopStream sends a close signal to stop the stream of tweets
+// StopStream sends a close signal to stop the stream of tweets.
 func (s *stream) StopStream() {
 	close(s.done)
 }
 
+// StartStream makes an HTTP request to twitter and starts streaming tweets to the Messages channel.
 func (s *stream) StartStream() {
 
 	res, err := s.httpClient.newHttpRequest(&requestOpts{

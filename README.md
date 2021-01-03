@@ -12,6 +12,12 @@ TwitStream is a Go library for streaming tweets with [Twitter's v2 Filtered Stre
 This project is not production ready. There are several things I need to do: 
 - [ ] This package streams strings. I need to convert json into go structs with [these possible response fields](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream)  
 
+
+## Installation
+
+`go get github.com/fallenstedt/twitter-stream`
+
+
 ## Examples
 
 #### Starting a stream
@@ -23,17 +29,17 @@ func startStreaming() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitter_stream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
-	// With an access token, you can create a new twitstream and start streaming
-	api := twitstream.NewTwitterStream(token.AccessToken)
+	// With an access token, you can create a new twitter_stream and start streaming
+	api := twitter_stream.NewTwitterStream(token.AccessToken)
 	api.Stream.StartStream()
 
 	// If you do not put this in a go routine, you will stream forever
@@ -59,17 +65,17 @@ func addRules() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitter_stream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
-	// With an access token, you can create a new twitstream and start adding rules
-	api := twitstream.NewTwitterStream(token.AccessToken)
+	// With an access token, you can create a new twitter_stream and start adding rules
+	api := twitter_stream.NewTwitterStream(token.AccessToken)
 
 	// You can add rules by passing in stringified JSON with the rules you want to add
 	// You can learn more about building rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
@@ -93,17 +99,17 @@ func deleteRules() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitter_stream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
-	// With an access token, you can create a new twitstream and start deleting rules
-	api := twitstream.NewTwitterStream(token.AccessToken)
+	// With an access token, you can create a new twitter_stream and start deleting rules
+	api := twitter_stream.NewTwitterStream(token.AccessToken)
 
 	// You can delete rules by passing in stringified JSON with the rules you want to delete
 	// Learn more about deleting rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/post-tweets-search-stream-rules
@@ -127,17 +133,17 @@ func getRules() {
 	// Obtain an AccessToken
 	// You can use the token generator and provide your api key and secret
 	// or provide an access token you already have
-	token := twitstream.NewTokenGenerator().SetApiKeyAndSecret(
+	token, err := twitter_stream.NewTokenGenerator().SetApiKeyAndSecret(
 		"your_twitter_api_key",
 		"your_twitter_api_secret",
 	).RequestBearerToken()
 
-	if token == nil {
+	if err != nil {
 		panic("No token found!")
 	}
 
-	// With an access token, you can create a new twitstream and start getting your rules
-	api := twitstream.NewTwitterStream(token.AccessToken)
+	// With an access token, you can create a new twitter_stream and start getting your rules
+	api := twitter_stream.NewTwitterStream(token.AccessToken)
 
 	// You can get your rules by invoking GetRules
 	// Learn more about getting rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
@@ -153,27 +159,12 @@ func getRules() {
 ```
 
 
-## Installation
-
-TODO
-
-```bash
-TODO
-```
 
 ## Usage
 
-```go
-package todo
 
-func todo() string {
-    return "TODO"
-}
-```
 
 ## Contributing
 
-todo
+Pull requests are always welcome. Please accompany a pull request with tests. 
 
-## License
-[MIT](https://choosealicense.com/licenses/mit/)

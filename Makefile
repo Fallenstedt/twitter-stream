@@ -5,6 +5,6 @@ test:
 	go test ./...
 
 github_release:
-	git tag -a $(VERSION) -m "Release v$(VERSION)" || true
-	git push origin $(VERSION)
+	git tag -a v$(VERSION) -m "Release v$(VERSION)" || true
+	git push origin v$(VERSION)
 
