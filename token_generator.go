@@ -1,4 +1,4 @@
-package twitstream
+package twitter_stream
 
 import (
 	"encoding/base64"
