@@ -70,7 +70,11 @@ func TestRequestBearerToken(t *testing.T) {
 			instance := newTokenGenerator(mockClient)
 			instance.SetApiKeyAndSecret("SomeKey", "SomeSecret")
 
-			data := instance.RequestBearerToken()
+			data, err := instance.RequestBearerToken()
+
+			if err != nil {
+				t.Errorf("got error %v", err)
+			}
 
 			if data == nil {
 				t.Errorf("got %s, want %s", data, tt.result)
