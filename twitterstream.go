@@ -1,5 +1,5 @@
-// Package twitter_stream provides an easy way to stream tweets using Twitter's v2 Streaming API.
-package twitter_stream
+// Package twitterstream provides an easy way to stream tweets using Twitter's v2 Streaming API.
+package twitterstream
 
 type twitterApi struct {
 	Rules  IRules

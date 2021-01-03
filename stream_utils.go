@@ -1,4 +1,4 @@
-package twitter_stream
+package twitterstream
 
 //
 // ❤️ Credit goes to the team at dghubble/go-twitter who originally built this code.

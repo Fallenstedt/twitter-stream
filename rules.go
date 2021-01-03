@@ -1,4 +1,4 @@
-package twitter_stream
+package twitterstream
 
 import (
 	"encoding/json"
