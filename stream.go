@@ -8,7 +8,7 @@ import (
 type (
 	// IStream is the interface that the stream struct implements.
 	IStream interface {
-		StartStream()
+		StartStream() error
 		StopStream()
 		GetMessages() *chan interface{}
 	}
@@ -43,7 +43,7 @@ func (s *stream) StopStream() {
 }
 
 // StartStream makes an HTTP request to twitter and starts streaming tweets to the Messages channel.
-func (s *stream) StartStream() {
+func (s *stream) StartStream() error {
 
 	res, err := s.httpClient.newHttpRequest(&requestOpts{
 		Method: "GET",
@@ -51,13 +51,14 @@ func (s *stream) StartStream() {
 	})
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	s.reader.setStreamResponseBody(res.Body)
 
 	s.group.Add(1)
 	go s.streamMessages(res)
+	return nil
 }
 
 func (s *stream) streamMessages(res *http.Response) {
@@ -67,7 +68,9 @@ func (s *stream) streamMessages(res *http.Response) {
 	for !stopped(s.done) {
 		data, err := s.reader.readNext()
 		if err != nil {
-			return
+			s.messages <- err
+			s.StopStream()
+			break
 		}
 		if len(data) == 0 {
 			// empty keep-alive
@@ -75,7 +78,6 @@ func (s *stream) streamMessages(res *http.Response) {
 		}
 
 		m := string(data)
-		// TODO send data or error here
 		s.messages <- m
 	}
 }
