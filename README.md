@@ -22,6 +22,18 @@ This project is not production ready. There are several things I need to do:
 
 #### Starting a stream
 
+Once you obtain an Access Token, you can create a TwitterStream instance with `NewTwitterStream(accesToken)`
+Then, you can invoke `StartStream` to begin the streaming process. 
+
+To read messages from your stream, start a loop with `GetMessages`. The messages that is returned could be
+a tweet, or an error. 
+
+The possible errors that can be returned are 
+* `io.EOF`: An error that you have reached the end of the stream. 
+* `non io.EOF errors`: This could be errors that are returned from Twitter during your stream
+
+[You can learn more about processing data by reading Twitter's documentation here](https://dev.twitter.com/streaming/overview/processing)
+
 ```go
 // Starting a stream assuming you already have
 // stream rules set in place
@@ -47,7 +59,7 @@ func startStreaming() {
 
 	// If you do not put this in a go routine, you will stream forever
 	go func() {
-		// Range over the messages channel to get a message
+		// Range over the messages channel to get a message, or an error.
 		for message := range *api.Stream.GetMessages() {
 			fmt.Println(message)
 		}
