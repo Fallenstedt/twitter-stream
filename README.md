@@ -40,7 +40,10 @@ func startStreaming() {
 
 	// With an access token, you can create a new twitterstream and start streaming
 	api := twitterstream.NewTwitterStream(token.AccessToken)
-	api.Stream.StartStream()
+	err := api.Stream.StartStream()
+	if err != nil {
+		panic(err)
+	}
 
 	// If you do not put this in a go routine, you will stream forever
 	go func() {
@@ -76,6 +79,7 @@ func addRules() {
 
 	// With an access token, you can create a new twitterstream and start adding rules
 	api := twitterstream.NewTwitterStream(token.AccessToken)
+
 
 	// You can add rules by passing in stringified JSON with the rules you want to add
 	// You can learn more about building rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
