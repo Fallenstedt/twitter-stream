@@ -10,21 +10,27 @@ type (
 	IStream interface {
 		StartStream() error
 		StopStream()
-		GetMessages() *chan interface{}
+		GetMessages() <-chan StreamMessage
 	}
 
 	stream struct {
-		messages   chan interface{}
+		messages   chan StreamMessage
 		httpClient IHttpClient
 		done       chan struct{}
 		group      *sync.WaitGroup
 		reader     IStreamResponseBodyReader
 	}
+
+	// StreamMessage is the message that is sent from the messages channel.
+	StreamMessage struct {
+		Data []byte
+		Err error
+	}
 )
 
 func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream {
 	return &stream{
-		messages:   make(chan interface{}),
+		messages:   make(chan StreamMessage),
 		done:       make(chan struct{}),
 		group:      new(sync.WaitGroup),
 		reader:     reader,
@@ -32,9 +38,9 @@ func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream
 	}
 }
 
-// GetMessages returns the messages channel.
-func (s *stream) GetMessages() *chan interface{} {
-	return &s.messages
+// GetMessages returns the read-only messages channel
+func (s *stream) GetMessages() <-chan StreamMessage {
+	return s.messages
 }
 
 // StopStream sends a close signal to stop the stream of tweets.
@@ -68,7 +74,10 @@ func (s *stream) streamMessages(res *http.Response) {
 	for !stopped(s.done) {
 		data, err := s.reader.readNext()
 		if err != nil {
-			s.messages <- err
+			s.messages <- StreamMessage{
+				Data: nil,
+				Err: err,
+			}
 			s.StopStream()
 			break
 		}
@@ -77,7 +86,9 @@ func (s *stream) streamMessages(res *http.Response) {
 			continue
 		}
 
-		m := string(data)
-		s.messages <- m
+		s.messages <- StreamMessage{
+			Data: data,
+			Err: nil,
+		}
 	}
 }

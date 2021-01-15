@@ -60,8 +60,14 @@ func startStreaming() {
 	// If you do not put this in a go routine, you will stream forever
 	go func() {
 		// Range over the messages channel to get a message, or an error.
-		for message := range *api.Stream.GetMessages() {
-			fmt.Println(message)
+		for message := range api.Stream.GetMessages() {
+			if message.Err != nil {
+                // Handle error from twitter
+                panic(message.Err)
+			}
+            // message.Data is a []byte. Create your own struct to process your data
+            // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream 
+			fmt.Println(string(message.Data))
 		}
 	}()
 
