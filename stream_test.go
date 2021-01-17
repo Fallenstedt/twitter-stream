@@ -27,7 +27,7 @@ func TestStopStream(t *testing.T) {
 	instance := newStream(client, reader)
 
 	instance.StopStream()
-	result := <- instance.done
+	result := <-instance.done
 
 	if result != struct{}{} {
 		t.Errorf("expected empty struct, got %v", result)
@@ -37,16 +37,16 @@ func TestStopStream(t *testing.T) {
 func TestStartStream(t *testing.T) {
 	var tests = []struct {
 		givenMockHttpRequestToStreamReturns func() IHttpClient
-		givenMockStreamResponseBodyReader func() IStreamResponseBodyReader
-		result StreamMessage
-	} {
+		givenMockStreamResponseBodyReader   func() IStreamResponseBodyReader
+		result                              StreamMessage
+	}{
 		{
 			func() IHttpClient {
 				mockClient := newHttpClientMock("foobar")
 				mockClient.MockNewHttpRequest = func(opts *requestOpts) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
-						Body: ioutil.NopCloser(bytes.NewReader([]byte("hello"))),
+						Body:       ioutil.NopCloser(bytes.NewReader([]byte("hello"))),
 					}, nil
 				}
 				return mockClient
@@ -61,7 +61,7 @@ func TestStartStream(t *testing.T) {
 			},
 			StreamMessage{
 				Data: []byte("hello"),
-				Err: nil,
+				Err:  nil,
 			},
 		},
 	}
@@ -75,7 +75,7 @@ func TestStartStream(t *testing.T) {
 				tt.givenMockStreamResponseBodyReader(),
 			)
 
-			err := instance.StartStream()
+			err := instance.StartStream("")
 			if err != nil {
 				t.Errorf("got err when starting stream %v", err)
 			}
@@ -86,12 +86,11 @@ func TestStartStream(t *testing.T) {
 					result <- message
 				}
 			}()
-			r := <- result
+			r := <-result
 			if string(tt.result.Data) != string(r.Data) {
 				t.Errorf("got %v, want %s", result, tt.result)
 			}
 		})
-
 
 	}
 }

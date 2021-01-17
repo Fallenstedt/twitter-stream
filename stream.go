@@ -8,10 +8,17 @@ import (
 type (
 	// IStream is the interface that the stream struct implements.
 	IStream interface {
-		StartStream() error
+		StartStream(queryParams string) error
 		StopStream()
 		GetMessages() <-chan StreamMessage
 	}
+
+	// StreamMessage is the message that is sent from the messages channel.
+	StreamMessage struct {
+		Data []byte
+		Err  error
+	}
+
 
 	stream struct {
 		messages   chan StreamMessage
@@ -19,12 +26,6 @@ type (
 		done       chan struct{}
 		group      *sync.WaitGroup
 		reader     IStreamResponseBodyReader
-	}
-
-	// StreamMessage is the message that is sent from the messages channel.
-	StreamMessage struct {
-		Data []byte
-		Err error
 	}
 )
 
@@ -48,22 +49,22 @@ func (s *stream) StopStream() {
 	close(s.done)
 }
 
-// StartStream makes an HTTP request to twitter and starts streaming tweets to the Messages channel.
-func (s *stream) StartStream() error {
-
-	res, err := s.httpClient.newHttpRequest(&requestOpts{
-		Method: "GET",
-		Url:    endpoints["stream"],
-	})
+// StartStream makes an HTTP GET request to twitter and starts streaming tweets to the Messages channel using Server Sent Events.
+// Accepts query params described in GET /2/tweets/search/stream to expand the payload that is returned. Query params string must begin with a ?.
+// See available query params here https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
+// See an example here: https://developer.twitter.com/en/docs/twitter-api/expansions.
+func (s *stream) StartStream(queryParams string) error {
+	res, err := s.httpClient.getSearchStream(queryParams)
 
 	if err != nil {
 		return err
 	}
 
 	s.reader.setStreamResponseBody(res.Body)
-
 	s.group.Add(1)
+
 	go s.streamMessages(res)
+
 	return nil
 }
 
@@ -76,7 +77,7 @@ func (s *stream) streamMessages(res *http.Response) {
 		if err != nil {
 			s.messages <- StreamMessage{
 				Data: nil,
-				Err: err,
+				Err:  err,
 			}
 			s.StopStream()
 			break
@@ -88,7 +89,7 @@ func (s *stream) streamMessages(res *http.Response) {
 
 		s.messages <- StreamMessage{
 			Data: data,
-			Err: nil,
+			Err:  nil,
 		}
 	}
 }

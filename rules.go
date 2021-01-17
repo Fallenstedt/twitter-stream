@@ -42,19 +42,13 @@ func newRules(httpClient IHttpClient) *rules {
 // AddRules adds or deletes rules to the stream using twitter's POST /2/tweets/search/stream/rules endpoint.
 // The body is a stringified object.
 func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
-
-	var url string
-	if dryRun {
-		url = endpoints["rules"] + "?dry_run=true"
-	} else {
-		url = endpoints["rules"]
-	}
-
-	res, err := t.httpClient.newHttpRequest(&requestOpts{
-		Method: "POST",
-		Url:    url,
-		Body:   body,
-	})
+	res, err := t.httpClient.addRules(func() string {
+		if dryRun {
+			return "?dry_run=true"
+		} else {
+			return ""
+		}
+	}(), body)
 
 	if err != nil {
 		return nil, err
@@ -62,7 +56,11 @@ func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 
 	defer res.Body.Close()
 	data := new(rulesResponse)
-	json.NewDecoder(res.Body).Decode(data)
+
+	err = json.NewDecoder(res.Body).Decode(data)
+	if err != nil {
+		return nil, err
+	}
 
 	return data, nil
 }
