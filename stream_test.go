@@ -43,7 +43,7 @@ func TestStartStream(t *testing.T) {
 		{
 			func() IHttpClient {
 				mockClient := newHttpClientMock("foobar")
-				mockClient.MockNewHttpRequest = func(opts *requestOpts) (*http.Response, error) {
+				mockClient.MockGetSearchStream = func(queryParams string) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body:       ioutil.NopCloser(bytes.NewReader([]byte("hello"))),
