@@ -67,11 +67,7 @@ func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 
 // GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
 func (t *rules) GetRules() (*rulesResponse, error) {
-	res, err := t.httpClient.newHttpRequest(&requestOpts{
-		Method: "GET",
-		Url:    endpoints["rules"],
-		Body:   "",
-	})
+	res, err := t.httpClient.getRules()
 
 	if err != nil {
 		return nil, err

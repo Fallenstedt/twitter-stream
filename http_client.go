@@ -15,7 +15,9 @@ var endpoints = make(twitterEndpoints)
 type (
 	// IHttpClient is the interface the httpClient struct implements.
 	IHttpClient interface {
+
 		newHttpRequest(opts *requestOpts) (*http.Response, error)
+		getRules() (*http.Response, error)
 		getSearchStream(queryParams string) (*http.Response, error)
 		addRules(queryParams string, body string) (*http.Response, error)
 		generateUrl(name string, queryParams string) (string, error)
@@ -41,6 +43,16 @@ func newHttpClient(token string) *httpClient {
 	endpoints["stream"] = "https://api.twitter.com/2/tweets/search/stream"
 	endpoints["token"] = "https://api.twitter.com/oauth2/token"
 	return &httpClient{token}
+}
+
+func (t *httpClient) getRules() (*http.Response, error)  {
+	res, err := t.newHttpRequest(&requestOpts{
+		Method: "GET",
+		Url:    endpoints["rules"],
+		Body:   "",
+	})
+
+	return res, err
 }
 
 func (t *httpClient) addRules(queryParams string, body string) (*http.Response, error) {

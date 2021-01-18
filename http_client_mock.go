@@ -6,6 +6,7 @@ type mockHttpClient struct {
 	token              string
 	MockNewHttpRequest func(opts *requestOpts) (*http.Response, error)
 	MockGetSearchStream func(queryParams string) (*http.Response, error)
+	MockGetRules func() (*http.Response, error)
 	MockAddRules func(queryParams string, body string) (*http.Response, error)
 	MockGenerateUrl func (name string, queryParams string) (string, error)
 }
@@ -16,6 +17,10 @@ func newHttpClientMock(token string) *mockHttpClient {
 
 func (t *mockHttpClient) generateUrl(name string, queryParams string) (string, error) {
 	return t.MockGenerateUrl(name, queryParams)
+}
+
+func (t *mockHttpClient) getRules() (*http.Response, error) {
+	return t.MockGetRules()
 }
 
 func (t *mockHttpClient) addRules(queryParams string, body string) (*http.Response, error) {

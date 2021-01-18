@@ -106,11 +106,11 @@ func TestAddRules(t *testing.T) {
 
 func TestGetRules(t *testing.T) {
 	var tests = []struct {
-		mockRequest func(opts *requestOpts) (*http.Response, error)
+		mockRequest func() (*http.Response, error)
 		result      *rulesResponse
 	}{
 		{
-			func(opts *requestOpts) (*http.Response, error) {
+			func() (*http.Response, error) {
 				json := `{
 					"data": [{
 						"value": "cat has:images", 
@@ -157,7 +157,7 @@ func TestGetRules(t *testing.T) {
 
 		t.Run(testName, func(t *testing.T) {
 			mockClient := newHttpClientMock("sometoken")
-			mockClient.MockNewHttpRequest = tt.mockRequest
+			mockClient.MockGetRules = tt.mockRequest
 
 			instance := newRules(mockClient)
 			result, err := instance.GetRules()
