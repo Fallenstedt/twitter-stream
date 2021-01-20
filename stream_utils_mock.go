@@ -5,7 +5,7 @@ import (
 )
 
 type mockStreamResponseBodyReader struct {
-	MockReadNext func() ([]byte, error)
+	MockReadNext              func() ([]byte, error)
 	MockSetStreamResponseBody func(body io.Reader)
 }
 
