@@ -18,6 +18,7 @@ type (
 	rulesResponse struct {
 		Data []rulesResponseValue
 		Meta rulesResponseMeta
+		Errors []rulesResponseError
 	}
 
 	rulesResponseValue struct {
@@ -29,6 +30,13 @@ type (
 		Sent    string                      `json:"sent"`
 		Summary addRulesResponseMetaSummary `json:"summary"`
 	}
+	rulesResponseError struct {
+		Value string `json:"value"`
+		Id string `json:"id"`
+		Title string `json:"title"`
+		Type string `json:"type"`
+	}
+
 	addRulesResponseMetaSummary struct {
 		Created    uint `json:"created"`
 		NotCreated uint `json:"not_created"`
@@ -41,6 +49,7 @@ func newRules(httpClient IHttpClient) *rules {
 
 // AddRules adds or deletes rules to the stream using twitter's POST /2/tweets/search/stream/rules endpoint.
 // The body is a stringified object.
+// Learn about the possible error messages returned here https://developer.twitter.com/en/support/twitter-api/error-troubleshooting.
 func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 	res, err := t.httpClient.addRules(func() string {
 		if dryRun {
@@ -61,7 +70,6 @@ func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return data, nil
 }
 

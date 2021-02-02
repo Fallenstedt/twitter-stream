@@ -34,7 +34,8 @@ func TestAddRules(t *testing.T) {
 							"created": 1,
 							"not_created": 0
 						}
-					}
+					},
+					"errors": []
 				}`
 
 				body := ioutil.NopCloser(bytes.NewReader([]byte(json)))
@@ -59,6 +60,7 @@ func TestAddRules(t *testing.T) {
 						NotCreated: 0,
 					},
 				},
+				Errors: nil,
 			},
 		},
 	}

@@ -53,8 +53,8 @@ func (s *stream) StopStream() {
 // Accepts query params described in GET /2/tweets/search/stream to expand the payload that is returned. Query params string must begin with a ?.
 // See available query params here https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
 // See an example here: https://developer.twitter.com/en/docs/twitter-api/expansions.
-func (s *stream) StartStream(queryParams string) error {
-	res, err := s.httpClient.getSearchStream(queryParams)
+func (s *stream) StartStream(optionalQueryParams string) error {
+	res, err := s.httpClient.getSearchStream(optionalQueryParams)
 
 	if err != nil {
 		return err
