@@ -8,13 +8,20 @@ import (
 type (
 	// IStream is the interface that the stream struct implements.
 	IStream interface {
-		StartStream() error
+		StartStream(queryParams string) error
 		StopStream()
-		GetMessages() *chan interface{}
+		GetMessages() <-chan StreamMessage
 	}
 
+	// StreamMessage is the message that is sent from the messages channel.
+	StreamMessage struct {
+		Data []byte
+		Err  error
+	}
+
+
 	stream struct {
-		messages   chan interface{}
+		messages   chan StreamMessage
 		httpClient IHttpClient
 		done       chan struct{}
 		group      *sync.WaitGroup
@@ -24,7 +31,7 @@ type (
 
 func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream {
 	return &stream{
-		messages:   make(chan interface{}),
+		messages:   make(chan StreamMessage),
 		done:       make(chan struct{}),
 		group:      new(sync.WaitGroup),
 		reader:     reader,
@@ -32,9 +39,9 @@ func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream
 	}
 }
 
-// GetMessages returns the messages channel.
-func (s *stream) GetMessages() *chan interface{} {
-	return &s.messages
+// GetMessages returns the read-only messages channel
+func (s *stream) GetMessages() <-chan StreamMessage {
+	return s.messages
 }
 
 // StopStream sends a close signal to stop the stream of tweets.
@@ -42,22 +49,22 @@ func (s *stream) StopStream() {
 	close(s.done)
 }
 
-// StartStream makes an HTTP request to twitter and starts streaming tweets to the Messages channel.
-func (s *stream) StartStream() error {
-
-	res, err := s.httpClient.newHttpRequest(&requestOpts{
-		Method: "GET",
-		Url:    endpoints["stream"],
-	})
+// StartStream makes an HTTP GET request to twitter and starts streaming tweets to the Messages channel using Server Sent Events.
+// Accepts query params described in GET /2/tweets/search/stream to expand the payload that is returned. Query params string must begin with a ?.
+// See available query params here https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
+// See an example here: https://developer.twitter.com/en/docs/twitter-api/expansions.
+func (s *stream) StartStream(optionalQueryParams string) error {
+	res, err := s.httpClient.getSearchStream(optionalQueryParams)
 
 	if err != nil {
 		return err
 	}
 
 	s.reader.setStreamResponseBody(res.Body)
-
 	s.group.Add(1)
+
 	go s.streamMessages(res)
+
 	return nil
 }
 
@@ -68,7 +75,10 @@ func (s *stream) streamMessages(res *http.Response) {
 	for !stopped(s.done) {
 		data, err := s.reader.readNext()
 		if err != nil {
-			s.messages <- err
+			s.messages <- StreamMessage{
+				Data: nil,
+				Err:  err,
+			}
 			s.StopStream()
 			break
 		}
@@ -77,7 +87,9 @@ func (s *stream) streamMessages(res *http.Response) {
 			continue
 		}
 
-		m := string(data)
-		s.messages <- m
+		s.messages <- StreamMessage{
+			Data: data,
+			Err:  nil,
+		}
 	}
 }

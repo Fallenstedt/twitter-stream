@@ -12,7 +12,7 @@ func TestAddRules(t *testing.T) {
 
 	var tests = []struct {
 		body        string
-		mockRequest func(opts *requestOpts) (*http.Response, error)
+		mockRequest func(queryParams string, body string) (*http.Response, error)
 		result      *rulesResponse
 	}{
 		{
@@ -21,7 +21,7 @@ func TestAddRules(t *testing.T) {
 					{"value": "cat has:images", "tag": "cat tweets with images"}
 				]
 			}`,
-			func(opts *requestOpts) (*http.Response, error) {
+			func(queryParams string, bodyRequest string) (*http.Response, error) {
 				json := `{
 					"data": [{
 						"value": "cat has:images", 
@@ -34,7 +34,8 @@ func TestAddRules(t *testing.T) {
 							"created": 1,
 							"not_created": 0
 						}
-					}
+					},
+					"errors": []
 				}`
 
 				body := ioutil.NopCloser(bytes.NewReader([]byte(json)))
@@ -59,6 +60,7 @@ func TestAddRules(t *testing.T) {
 						NotCreated: 0,
 					},
 				},
+				Errors: nil,
 			},
 		},
 	}
@@ -68,7 +70,7 @@ func TestAddRules(t *testing.T) {
 
 		t.Run(testName, func(t *testing.T) {
 			mockClient := newHttpClientMock("sometoken")
-			mockClient.MockNewHttpRequest = tt.mockRequest
+			mockClient.MockAddRules = tt.mockRequest
 
 			instance := newRules(mockClient)
 			result, err := instance.AddRules(tt.body, false)
@@ -104,14 +106,13 @@ func TestAddRules(t *testing.T) {
 	}
 }
 
-
 func TestGetRules(t *testing.T) {
 	var tests = []struct {
-		mockRequest func(opts *requestOpts) (*http.Response, error)
+		mockRequest func() (*http.Response, error)
 		result      *rulesResponse
 	}{
 		{
-			func(opts *requestOpts) (*http.Response, error) {
+			func() (*http.Response, error) {
 				json := `{
 					"data": [{
 						"value": "cat has:images", 
@@ -158,7 +159,7 @@ func TestGetRules(t *testing.T) {
 
 		t.Run(testName, func(t *testing.T) {
 			mockClient := newHttpClientMock("sometoken")
-			mockClient.MockNewHttpRequest = tt.mockRequest
+			mockClient.MockGetRules = tt.mockRequest
 
 			instance := newRules(mockClient)
 			result, err := instance.GetRules()

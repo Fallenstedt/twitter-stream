@@ -5,12 +5,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/fallenstedt/twitter-stream)](https://goreportcard.com/report/github.com/fallenstedt/twitter-stream)
 [![Go Reference](https://pkg.go.dev/badge/github.com/fallenstedt/twitter-stream.svg)](https://pkg.go.dev/github.com/fallenstedt/twitter-stream)
 
-TwitStream is a Go library for streaming tweets with [Twitter's v2 Filtered Streaming API](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/introduction).
+TwitStream is a Go library for creating streaming rules and streaming tweets with [Twitter's v2 Filtered Streaming API](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/introduction). 
+See [examples](https://github.com/fallenstedt/twitter-stream/tree/master/example) to start adding your own rules and start streaming.  
+
 
 ![example of twit stream](./example.gif)
-
-This project is not production ready. There are several things I need to do: 
-- [ ] This package streams strings. I need to convert json into go structs with [these possible response fields](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream)  
 
 
 ## Installation
@@ -18,162 +17,131 @@ This project is not production ready. There are several things I need to do:
 `go get github.com/fallenstedt/twitter-stream`
 
 
+
+
 ## Examples
 
 #### Starting a stream
 
-Once you obtain an Access Token, you can create a TwitterStream instance with `NewTwitterStream(accesToken)`
-Then, you can invoke `StartStream` to begin the streaming process. 
-
-To read messages from your stream, start a loop with `GetMessages`. The messages that is returned could be
-a tweet, or an error. 
-
-The possible errors that can be returned are 
-* `io.EOF`: An error that you have reached the end of the stream. 
-* `non io.EOF errors`: This could be errors that are returned from Twitter during your stream
-
-[You can learn more about processing data by reading Twitter's documentation here](https://dev.twitter.com/streaming/overview/processing)
-
+##### Obtain an Access Token using your Twitter Access Key and Secret.
+You need an access token to do any streaming. `twitterstream` provides an easy way to fetch an access token.
 ```go
-// Starting a stream assuming you already have
-// stream rules set in place
-func startStreaming() {
-	// Obtain an AccessToken
-	// You can use the token generator and provide your api key and secret
-	// or provide an access token you already have
-	token, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(
-		"your_twitter_api_key",
-		"your_twitter_api_secret",
-	).RequestBearerToken()
+	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret("key", "secret").RequestBearerToken()
 
-	if err != nil {
-		panic("No token found!")
-	}
-
-	// With an access token, you can create a new twitterstream and start streaming
-	api := twitterstream.NewTwitterStream(token.AccessToken)
-	err := api.Stream.StartStream()
 	if err != nil {
 		panic(err)
 	}
+```
 
-	// If you do not put this in a go routine, you will stream forever
+##### Create a streaming api
+Create a twitterstream instance with your access token from above.
+
+```go
+	api := twitterstream.NewTwitterStream(tok.AccessToken)
+```
+
+##### Start Stream
+Start your stream. This is a long-running HTTP GET request. 
+You can get specific data you want by adding [query params](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream).
+Additionally, [view an example of query params here](https://developer.twitter.com/en/docs/twitter-api/expansions).
+
+```go
+    err := api.Stream.StartStream("")
+
+	if err != nil {
+		panic(err)
+	}
+```
+
+4. Consume Messages from the Stream
+Handle any `io.EOF` and other errors that arise first, then unmarshal your bytes into your favorite struct. Below is an example with strings 
+```go
 	go func() {
-		// Range over the messages channel to get a message, or an error.
-		for message := range *api.Stream.GetMessages() {
-			fmt.Println(message)
+		for message := range api.Stream.GetMessages() {
+			if message.Err != nil {
+				panic(message.Err)
+			}
+                        // Will print something like: 
+                        //{"data":{"id":"1356479201000","text":"Look at this cat picture"},"matching_rules":[{"id":12345,"tag":"cat tweets with images"}]}
+			fmt.Println(string(message.Data))
 		}
 	}()
 
-	// After 30 seconds, stop the stream
 	time.Sleep(time.Second * 30)
-	api.Stream.StopStream()
-}
 ```
 
 #### Creating, Deleting, and Getting Rules
 
+##### Obtain an Access Token using your Twitter Access Key and Secret.
+You need an access token to do anything. `twitterstream` provides an easy way to fetch an access token.
 ```go
-
-
-func addRules() {
-	// Obtain an AccessToken
-	// You can use the token generator and provide your api key and secret
-	// or provide an access token you already have
-	token, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(
-		"your_twitter_api_key",
-		"your_twitter_api_secret",
-	).RequestBearerToken()
+	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret("key", "secret").RequestBearerToken()
 
 	if err != nil {
-		panic("No token found!")
+		panic(err)
+	}
+```
+
+##### Create a streaming api
+Create a twitterstream instance with your access token from above.
+
+```go
+	api := twitterstream.NewTwitterStream(tok.AccessToken)
+```
+
+##### Get Rules
+Use the `Rules` struct to access different Rules endpoints as defined in [Twitter's API Reference](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference)
+```go
+    res, err := api.Rules.GetRules()
+
+	if err != nil {
+		panic(err)
 	}
 
-	// With an access token, you can create a new twitterstream and start adding rules
-	api := twitterstream.NewTwitterStream(token.AccessToken)
+	if res.Errors != nil && len(res.Errors) > 0 {
+		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
+		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+	}
 
+	fmt.Println(res.Data)
+```
 
-	// You can add rules by passing in stringified JSON with the rules you want to add
-	// You can learn more about building rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule
-	// Or here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/post-tweets-search-stream-rules
-	// The response are the rules you created
-	// The 2nd argument will perform a dry run if set to true.
+##### Add Rules
+```go
 	res, err := api.Rules.AddRules(`{
 		"add": [
 				{"value": "cat has:images", "tag": "cat tweets with images"}
 			]
-		}`, false)
+		}`, true) // dryRun is set to true
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(res.Data, res.Meta)
-}
-
-func deleteRules() {
-	// Obtain an AccessToken
-	// You can use the token generator and provide your api key and secret
-	// or provide an access token you already have
-	token, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(
-		"your_twitter_api_key",
-		"your_twitter_api_secret",
-	).RequestBearerToken()
-
-	if err != nil {
-		panic("No token found!")
+	if res.Errors != nil && len(res.Errors) > 0 {
+		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
+		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
 	}
-
-	// With an access token, you can create a new twitterstream and start deleting rules
-	api := twitterstream.NewTwitterStream(token.AccessToken)
-
-	// You can delete rules by passing in stringified JSON with the rules you want to delete
-	// Learn more about deleting rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/post-tweets-search-stream-rules
-	// The ids are the rule's ids you want to delete. You can find out how to get your ids in the below example
-	// The response are the rules you have.
-	// The 2nd argument will perform a dry run if set to true.
+```
+##### Delete Rules
+```go
+// use api.Rules.GetRules to find the ID number for an existing rule
 	res, err := api.Rules.AddRules(`{
 		"delete": {
-				"ids": ["1340894899986579457"]
+				"ids": ["1234567890"]
 			}
-		}`, false)
+		}`, true)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(res.Data, res.Meta)
-}
-
-func getRules() {
-	// Obtain an AccessToken
-	// You can use the token generator and provide your api key and secret
-	// or provide an access token you already have
-	token, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(
-		"your_twitter_api_key",
-		"your_twitter_api_secret",
-	).RequestBearerToken()
-
-	if err != nil {
-		panic("No token found!")
+	if res.Errors != nil && len(res.Errors) > 0 {
+		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
+		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
 	}
-
-	// With an access token, you can create a new twitterstream and start getting your rules
-	api := twitterstream.NewTwitterStream(token.AccessToken)
-
-	// You can get your rules by invoking GetRules
-	// Learn more about getting rules here: https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream-rules
-	res, err := api.Rules.GetRules()
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(res.Data, res.Meta)
-}
 
 ```
-
 
 
 ## Contributing
