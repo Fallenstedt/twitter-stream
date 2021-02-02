@@ -68,6 +68,7 @@ Handle any `io.EOF` and other errors that arise first, then unmarshal your bytes
 	}()
 
 	time.Sleep(time.Second * 30)
+	api.Stream.StopStream()
 ```
 
 #### Creating, Deleting, and Getting Rules
