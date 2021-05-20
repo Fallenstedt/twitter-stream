@@ -1,8 +1,8 @@
 package twitterstream
 
 import (
+	"io"
 	"net/http"
-	"sync"
 )
 
 type (
@@ -15,7 +15,7 @@ type (
 
 	// StreamMessage is the message that is sent from the messages channel.
 	StreamMessage struct {
-		Data []byte
+		Data *io.PipeReader
 		Err  error
 	}
 
@@ -24,7 +24,6 @@ type (
 		messages   chan StreamMessage
 		httpClient IHttpClient
 		done       chan struct{}
-		group      *sync.WaitGroup
 		reader     IStreamResponseBodyReader
 	}
 )
@@ -33,7 +32,6 @@ func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *stream
 	return &stream{
 		messages:   make(chan StreamMessage),
 		done:       make(chan struct{}),
-		group:      new(sync.WaitGroup),
 		reader:     reader,
 		httpClient: httpClient,
 	}
@@ -61,7 +59,6 @@ func (s *stream) StartStream(optionalQueryParams string) error {
 	}
 
 	s.reader.setStreamResponseBody(res.Body)
-	s.group.Add(1)
 
 	go s.streamMessages(res)
 
@@ -70,8 +67,7 @@ func (s *stream) StartStream(optionalQueryParams string) error {
 
 func (s *stream) streamMessages(res *http.Response) {
 	defer res.Body.Close()
-	defer s.group.Done()
-
+	pipeReader, pipeWriter := io.Pipe()
 	for !stopped(s.done) {
 		data, err := s.reader.readNext()
 		if err != nil {
@@ -87,8 +83,18 @@ func (s *stream) streamMessages(res *http.Response) {
 			continue
 		}
 
+		_, err = pipeWriter.Write(data)
+		if err != nil {
+			s.messages <- StreamMessage{
+				Data: nil,
+				Err:  err,
+			}
+			s.StopStream()
+			break
+		}
+
 		s.messages <- StreamMessage{
-			Data: data,
+			Data: pipeReader,
 			Err:  nil,
 		}
 	}
