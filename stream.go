@@ -47,7 +47,7 @@ func (s *stream) StopStream() {
 	close(s.done)
 }
 
-// StartStream makes an HTTP GET request to twitter and starts streaming tweets to the Messages channel using Server Sent Events.
+// StartStream makes an HTTP GET request to twitter and starts streaming tweets to the Messages channel.
 // Accepts query params described in GET /2/tweets/search/stream to expand the payload that is returned. Query params string must begin with a ?.
 // See available query params here https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
 // See an example here: https://developer.twitter.com/en/docs/twitter-api/expansions.
