@@ -41,10 +41,33 @@ Create a twitterstream instance with your access token from above.
 	api := twitterstream.NewTwitterStream(tok.AccessToken)
 ```
 
+##### Set your unmarshal hook
+It is encouraged you set an unmarshal hook for thread-safety. Go's `bytes.Buffer` is not thread safe. Sharing a `bytes.Buffer`
+across multiple goroutines introduces risk of panics when decoding json [source](https://github.com/Fallenstedt/twitter-stream/issues/13).
+To avoid panics, it's encouraged to unmarshal json in the same goroutine where the `bytes.Buffer` exists. Use `SetUnmarshalHook` to set a function that unmarshals json.
+
+By default, twitterstream's unmarshal hook will return `[]byte` if you want to live dangerously.
+
+```go
+    api.Stream.SetUnmarshalHook(func(bytes []byte) (interface{}, error) {
+        // StreemData is a struct that represents your returned json
+    	// This is a quick resource to generate a struct from your json
+        // https://mholt.github.io/json-to-go/
+        data := StreamData{}
+        if err := json.Unmarshal(bytes, &data); err != nil {
+            log.Printf("Failed to unmarshal bytes: %v", err)
+        }
+        return data, err
+    })
+```  
+
+
+
+
 ##### Start Stream
 Start your stream. This is a long-running HTTP GET request. 
 You can get specific data you want by adding [query params](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream).
-Additionally, [view an example of query params here](https://developer.twitter.com/en/docs/twitter-api/expansions).
+Additionally, [view an example of query params here](https://developer.twitter.com/en/docs/twitter-api/expansions), or in the [examples](https://github.com/fallenstedt/twitter-stream/tree/master/example)
 
 ```go
     err := api.Stream.StartStream("")
@@ -54,7 +77,7 @@ Additionally, [view an example of query params here](https://developer.twitter.c
 	}
 ```
 
-4. Consume Messages from the Stream
+Consume Messages from the Stream
 Handle any `io.EOF` and other errors that arise first, then unmarshal your bytes into your favorite struct. Below is an example with strings 
 ```go
 	go func() {

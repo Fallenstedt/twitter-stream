@@ -87,7 +87,12 @@ func TestStartStream(t *testing.T) {
 				}
 			}()
 			r := <-result
-			if string(tt.result.Data) != string(r.Data) {
+
+			expected, _ := tt.result.Data.([]byte)
+			res, _ := r.Data.([]byte)
+
+
+			if string(expected) != string(res) {
 				t.Errorf("got %v, want %s", result, tt.result)
 			}
 		})
