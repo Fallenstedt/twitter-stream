@@ -16,8 +16,8 @@ type (
 	}
 
 	rulesResponse struct {
-		Data []rulesResponseValue
-		Meta rulesResponseMeta
+		Data   []rulesResponseValue
+		Meta   rulesResponseMeta
 		Errors []rulesResponseError
 	}
 
@@ -32,9 +32,9 @@ type (
 	}
 	rulesResponseError struct {
 		Value string `json:"value"`
-		Id string `json:"id"`
+		Id    string `json:"id"`
 		Title string `json:"title"`
-		Type string `json:"type"`
+		Type  string `json:"type"`
 	}
 
 	addRulesResponseMetaSummary struct {

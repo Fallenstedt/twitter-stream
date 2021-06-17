@@ -4,7 +4,6 @@ import (
 	"net/http"
 )
 
-
 type (
 	// UnmarshalHook is a function that will unmarshal json.
 	UnmarshalHook func([]byte) (interface{}, error)
@@ -29,10 +28,10 @@ type (
 	// in a separate goroutine is not recommended because the Go bytes.Buffer is not thread safe.
 	Stream struct {
 		unmarshalHook UnmarshalHook
-		messages   chan StreamMessage
-		httpClient IHttpClient
-		done       chan struct{}
-		reader     IStreamResponseBodyReader
+		messages      chan StreamMessage
+		httpClient    IHttpClient
+		done          chan struct{}
+		reader        IStreamResponseBodyReader
 	}
 )
 

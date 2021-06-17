@@ -91,7 +91,6 @@ func TestStartStream(t *testing.T) {
 			expected, _ := tt.result.Data.([]byte)
 			res, _ := r.Data.([]byte)
 
-
 			if string(expected) != string(res) {
 				t.Errorf("got %v, want %s", result, tt.result)
 			}

@@ -5,17 +5,19 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type twitterEndpoints map[string]string
+
 var endpoints = make(twitterEndpoints)
 
 type (
 	// IHttpClient is the interface the httpClient struct implements.
 	IHttpClient interface {
-
 		newHttpRequest(opts *requestOpts) (*http.Response, error)
 		getRules() (*http.Response, error)
 		getSearchStream(queryParams string) (*http.Response, error)
@@ -28,6 +30,7 @@ type (
 	}
 
 	requestOpts struct {
+		Retries uint8
 		Method  string
 		Url     string
 		Body    string
@@ -45,7 +48,7 @@ func newHttpClient(token string) *httpClient {
 	return &httpClient{token}
 }
 
-func (t *httpClient) getRules() (*http.Response, error)  {
+func (t *httpClient) getRules() (*http.Response, error) {
 	res, err := t.newHttpRequest(&requestOpts{
 		Method: "GET",
 		Url:    endpoints["rules"],
@@ -56,7 +59,7 @@ func (t *httpClient) getRules() (*http.Response, error)  {
 }
 
 func (t *httpClient) addRules(queryParams string, body string) (*http.Response, error) {
-	url, err :=  t.generateUrl("rules", queryParams)
+	url, err := t.generateUrl("rules", queryParams)
 
 	if err != nil {
 		return nil, err
@@ -147,13 +150,34 @@ func (t *httpClient) newHttpRequest(opts *requestOpts) (*http.Response, error) {
 		return nil, err
 	}
 
+	// Retry with backoff if 429
+	if resp.StatusCode == 429 {
+		log.Printf("Retrying network request %s with backoff", opts.Url)
+
+		delay := t.getBackOffTime(opts.Retries)
+		log.Printf("Sleeping for %v seconds", delay)
+		time.Sleep(delay)
+
+		opts.Retries += 1
+		return t.newHttpRequest(opts)
+	}
+
 	// Reject if 400 or greater
 	if resp.StatusCode >= 400 {
-		log.Printf("Network Request failed: %v", resp.StatusCode)
+		log.Printf("Network Request at %s failed: %v", opts.Url, resp.StatusCode)
 		body, _ := ioutil.ReadAll(resp.Body)
 		msg := "Network request failed: " + string(body)
 		return nil, errors.New(msg)
 	}
 
 	return resp, nil
+}
+
+func (t *httpClient) getBackOffTime(retries uint8) time.Duration {
+	exponentialBackoffCeilingSecs := 30
+	delaySecs := int(math.Floor((math.Pow(2, float64(retries)) - 1) * 0.5))
+	if delaySecs > exponentialBackoffCeilingSecs {
+		delaySecs = 30
+	}
+	return time.Duration(delaySecs) * time.Second
 }

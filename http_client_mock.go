@@ -3,12 +3,12 @@ package twitterstream
 import "net/http"
 
 type mockHttpClient struct {
-	token              string
-	MockNewHttpRequest func(opts *requestOpts) (*http.Response, error)
+	token               string
+	MockNewHttpRequest  func(opts *requestOpts) (*http.Response, error)
 	MockGetSearchStream func(queryParams string) (*http.Response, error)
-	MockGetRules func() (*http.Response, error)
-	MockAddRules func(queryParams string, body string) (*http.Response, error)
-	MockGenerateUrl func (name string, queryParams string) (string, error)
+	MockGetRules        func() (*http.Response, error)
+	MockAddRules        func(queryParams string, body string) (*http.Response, error)
+	MockGenerateUrl     func(name string, queryParams string) (string, error)
 }
 
 func newHttpClientMock(token string) *mockHttpClient {
