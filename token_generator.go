@@ -3,6 +3,7 @@ package twitterstream
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/fallenstedt/twitter-stream/httpclient"
 )
 
 type (
@@ -12,7 +13,7 @@ type (
 		SetApiKeyAndSecret(apiKey, apiSecret string) *tokenGenerator
 	}
 	tokenGenerator struct {
-		httpClient IHttpClient
+		httpClient httpclient.IHttpClient
 		apiKey     string
 		apiSecret  string
 	}
@@ -22,7 +23,7 @@ type (
 	}
 )
 
-func newTokenGenerator(httpClient IHttpClient) *tokenGenerator {
+func newTokenGenerator(httpClient httpclient.IHttpClient) *tokenGenerator {
 	return &tokenGenerator{httpClient: httpClient}
 }
 
@@ -36,16 +37,16 @@ func (a *tokenGenerator) SetApiKeyAndSecret(apiKey, apiSecret string) *tokenGene
 // RequestBearerToken requests a bearer token from twitter using the apiKey and apiSecret.
 func (a *tokenGenerator) RequestBearerToken() (*requestBearerTokenResponse, error) {
 
-	resp, err := a.httpClient.newHttpRequest(&requestOpts{
+	resp, err := a.httpClient.NewHttpRequest(&httpclient.RequestOpts{
 		Headers: []struct {
-			key   string
-			value string
+			Key   string
+			Value string
 		}{
 			{"Content-Type", "application/x-www-form-urlencoded;charset=UTF-8"},
 			{"Authorization", "Basic " + a.base64EncodeKeys()},
 		},
 		Method: "POST",
-		Url:    endpoints["token"],
+		Url:    httpclient.Endpoints["token"],
 		Body:   "grant_type=client_credentials",
 	})
 

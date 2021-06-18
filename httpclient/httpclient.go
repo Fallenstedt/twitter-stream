@@ -1,4 +1,5 @@
-package twitterstream
+package httpclient
+
 
 import (
 	"bytes"
@@ -13,59 +14,59 @@ import (
 
 type twitterEndpoints map[string]string
 
-var endpoints = make(twitterEndpoints)
+var Endpoints = make(twitterEndpoints)
 
 type (
 	// IHttpClient is the interface the httpClient struct implements.
 	IHttpClient interface {
-		newHttpRequest(opts *requestOpts) (*http.Response, error)
-		getRules() (*http.Response, error)
-		getSearchStream(queryParams string) (*http.Response, error)
-		addRules(queryParams string, body string) (*http.Response, error)
-		generateUrl(name string, queryParams string) (string, error)
+		NewHttpRequest(opts *RequestOpts) (*http.Response, error)
+		GetRules() (*http.Response, error)
+		GetSearchStream(queryParams string) (*http.Response, error)
+		AddRules(queryParams string, body string) (*http.Response, error)
+		GenerateUrl(name string, queryParams string) (string, error)
 	}
 
 	httpClient struct {
 		token string
 	}
 
-	requestOpts struct {
+	RequestOpts struct {
 		Retries uint8
 		Method  string
 		Url     string
 		Body    string
 		Headers []struct {
-			key   string
-			value string
+			Key   string
+			Value string
 		}
 	}
 )
 
-func newHttpClient(token string) *httpClient {
-	endpoints["rules"] = "https://api.twitter.com/2/tweets/search/stream/rules"
-	endpoints["stream"] = "https://api.twitter.com/2/tweets/search/stream"
-	endpoints["token"] = "https://api.twitter.com/oauth2/token"
+func NewHttpClient(token string) *httpClient {
+	Endpoints["rules"] = "https://api.twitter.com/2/tweets/search/stream/rules"
+	Endpoints["stream"] = "https://api.twitter.com/2/tweets/search/stream"
+	Endpoints["token"] = "https://api.twitter.com/oauth2/token"
 	return &httpClient{token}
 }
 
-func (t *httpClient) getRules() (*http.Response, error) {
-	res, err := t.newHttpRequest(&requestOpts{
+func (t *httpClient) GetRules() (*http.Response, error) {
+	res, err := t.NewHttpRequest(&RequestOpts{
 		Method: "GET",
-		Url:    endpoints["rules"],
+		Url:    Endpoints["rules"],
 		Body:   "",
 	})
 
 	return res, err
 }
 
-func (t *httpClient) addRules(queryParams string, body string) (*http.Response, error) {
-	url, err := t.generateUrl("rules", queryParams)
+func (t *httpClient) AddRules(queryParams string, body string) (*http.Response, error) {
+	url, err := t.GenerateUrl("rules", queryParams)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := t.newHttpRequest(&requestOpts{
+	res, err := t.NewHttpRequest(&RequestOpts{
 		Method: "POST",
 		Url:    url,
 		Body:   body,
@@ -78,15 +79,15 @@ func (t *httpClient) addRules(queryParams string, body string) (*http.Response, 
 	return res, nil
 }
 
-func (t *httpClient) getSearchStream(queryParams string) (*http.Response, error) {
+func (t *httpClient) GetSearchStream(queryParams string) (*http.Response, error) {
 	// Make an HTTP GET request to GET /2/tweets/search/stream
-	url, err := t.generateUrl("stream", queryParams)
+	url, err := t.GenerateUrl("stream", queryParams)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := t.newHttpRequest(&requestOpts{
+	res, err := t.NewHttpRequest(&RequestOpts{
 		Method: "GET",
 		Url:    url,
 	})
@@ -98,12 +99,12 @@ func (t *httpClient) getSearchStream(queryParams string) (*http.Response, error)
 	return res, nil
 }
 
-func (t *httpClient) generateUrl(name string, queryParams string) (string, error) {
+func (t *httpClient) GenerateUrl(name string, queryParams string) (string, error) {
 	var url string
 	if len(queryParams) > 0 {
-		url = endpoints[name] + queryParams
+		url = Endpoints[name] + queryParams
 	} else {
-		url = endpoints[name]
+		url = Endpoints[name]
 	}
 
 	if len(url) == 0 || !strings.HasPrefix(url, "https://api.twitter.com") {
@@ -113,7 +114,7 @@ func (t *httpClient) generateUrl(name string, queryParams string) (string, error
 	}
 }
 
-func (t *httpClient) newHttpRequest(opts *requestOpts) (*http.Response, error) {
+func (t *httpClient) NewHttpRequest(opts *RequestOpts) (*http.Response, error) {
 	client := &http.Client{}
 
 	var req *http.Request
@@ -134,11 +135,11 @@ func (t *httpClient) newHttpRequest(opts *requestOpts) (*http.Response, error) {
 	req.Header.Set("Content-Type", "application/json")
 	if len(opts.Headers) > 0 {
 		for _, header := range opts.Headers {
-			req.Header.Set(header.key, header.value)
+			req.Header.Set(header.Key, header.Value)
 		}
 	}
 
-	// Set token if this client has a token set
+	// Set token if this httpclient has a token set
 	if len(t.token) > 0 {
 		req.Header.Set("Authorization", "Bearer "+t.token)
 	}
@@ -159,7 +160,7 @@ func (t *httpClient) newHttpRequest(opts *requestOpts) (*http.Response, error) {
 		time.Sleep(delay)
 
 		opts.Retries += 1
-		return t.newHttpRequest(opts)
+		return t.NewHttpRequest(opts)
 	}
 
 	// Reject if 400 or greater

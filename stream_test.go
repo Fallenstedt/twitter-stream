@@ -3,6 +3,7 @@ package twitterstream
 import (
 	"bytes"
 	"fmt"
+	"github.com/fallenstedt/twitter-stream/httpclient"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 )
 
 func TestGetMessages(t *testing.T) {
-	client := newHttpClientMock("foobar")
+	client := httpclient.NewHttpClientMock("foobar")
 	reader := newStreamResponseBodyReader()
 	instance := newStream(client, reader)
 
@@ -22,7 +23,7 @@ func TestGetMessages(t *testing.T) {
 }
 
 func TestStopStream(t *testing.T) {
-	client := newHttpClientMock("foobar")
+	client := httpclient.NewHttpClientMock("foobar")
 	reader := newStreamResponseBodyReader()
 	instance := newStream(client, reader)
 
@@ -36,13 +37,13 @@ func TestStopStream(t *testing.T) {
 
 func TestStartStream(t *testing.T) {
 	var tests = []struct {
-		givenMockHttpRequestToStreamReturns func() IHttpClient
+		givenMockHttpRequestToStreamReturns func() httpclient.IHttpClient
 		givenMockStreamResponseBodyReader   func() IStreamResponseBodyReader
 		result                              StreamMessage
 	}{
 		{
-			func() IHttpClient {
-				mockClient := newHttpClientMock("foobar")
+			func() httpclient.IHttpClient {
+				mockClient := httpclient.NewHttpClientMock("foobar")
 				mockClient.MockGetSearchStream = func(queryParams string) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,

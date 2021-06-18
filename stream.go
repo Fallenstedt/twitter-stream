@@ -1,6 +1,7 @@
 package twitterstream
 
 import (
+	"github.com/fallenstedt/twitter-stream/httpclient"
 	"net/http"
 )
 
@@ -29,13 +30,13 @@ type (
 	Stream struct {
 		unmarshalHook UnmarshalHook
 		messages      chan StreamMessage
-		httpClient    IHttpClient
+		httpClient    httpclient.IHttpClient
 		done          chan struct{}
 		reader        IStreamResponseBodyReader
 	}
 )
 
-func newStream(httpClient IHttpClient, reader IStreamResponseBodyReader) *Stream {
+func newStream(httpClient httpclient.IHttpClient, reader IStreamResponseBodyReader) *Stream {
 	return &Stream{
 		unmarshalHook: func(bytes []byte) (interface{}, error) {
 			return bytes, nil
@@ -69,7 +70,7 @@ func (s *Stream) StopStream() {
 // See available query params here https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
 // See an example here: https://developer.twitter.com/en/docs/twitter-api/expansions.
 func (s *Stream) StartStream(optionalQueryParams string) error {
-	res, err := s.httpClient.getSearchStream(optionalQueryParams)
+	res, err := s.httpClient.GetSearchStream(optionalQueryParams)
 
 	if err != nil {
 		return err
