@@ -3,6 +3,7 @@ package twitterstream
 import (
 	"bytes"
 	"fmt"
+	"github.com/fallenstedt/twitter-stream/httpclient"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -69,7 +70,7 @@ func TestAddRules(t *testing.T) {
 		testName := fmt.Sprintf("TestAddRules (%d) %s", i, tt.body)
 
 		t.Run(testName, func(t *testing.T) {
-			mockClient := newHttpClientMock("sometoken")
+			mockClient := httpclient.NewHttpClientMock("sometoken")
 			mockClient.MockAddRules = tt.mockRequest
 
 			instance := newRules(mockClient)
@@ -158,7 +159,7 @@ func TestGetRules(t *testing.T) {
 		testName := fmt.Sprintf("TestGetRules (%d)", i)
 
 		t.Run(testName, func(t *testing.T) {
-			mockClient := newHttpClientMock("sometoken")
+			mockClient := httpclient.NewHttpClientMock("sometoken")
 			mockClient.MockGetRules = tt.mockRequest
 
 			instance := newRules(mockClient)

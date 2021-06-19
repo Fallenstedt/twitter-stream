@@ -3,6 +3,7 @@ package twitterstream
 import (
 	"bytes"
 	"fmt"
+	"github.com/fallenstedt/twitter-stream/httpclient"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -21,7 +22,7 @@ func TestSetApiKeyAndSecret(t *testing.T) {
 	for i, tt := range tests {
 		testName := fmt.Sprintf("(%d) %s %s", i, tt.apiKey, tt.apiSecret)
 		t.Run(testName, func(t *testing.T) {
-			result := newTokenGenerator(newHttpClientMock(""))
+			result := newTokenGenerator(httpclient.NewHttpClientMock(""))
 			result.SetApiKeyAndSecret(tt.apiKey, tt.apiSecret)
 
 			if result.apiKey != tt.result.apiKey {
@@ -37,10 +38,10 @@ func TestSetApiKeyAndSecret(t *testing.T) {
 
 func TestRequestBearerToken(t *testing.T) {
 	var tests = []struct {
-		mockRequest func(opts *requestOpts) (*http.Response, error)
+		mockRequest func(opts *httpclient.RequestOpts) (*http.Response, error)
 		result      *requestBearerTokenResponse
 	}{
-		{func(opts *requestOpts) (*http.Response, error) {
+		{func(opts *httpclient.RequestOpts) (*http.Response, error) {
 
 			json := `{
 				"token_type": "bearer",
@@ -64,7 +65,7 @@ func TestRequestBearerToken(t *testing.T) {
 		testName := fmt.Sprintf("(%d)", i)
 
 		t.Run(testName, func(t *testing.T) {
-			mockClient := newHttpClientMock("")
+			mockClient := httpclient.NewHttpClientMock("")
 			mockClient.MockNewHttpRequest = tt.mockRequest
 
 			instance := newTokenGenerator(mockClient)
