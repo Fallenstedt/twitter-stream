@@ -2,6 +2,7 @@ package twitterstream
 
 import (
 	"encoding/json"
+	"github.com/fallenstedt/twitter-stream/httpclient"
 )
 
 type (
@@ -12,12 +13,12 @@ type (
 	}
 
 	rules struct {
-		httpClient IHttpClient
+		httpClient httpclient.IHttpClient
 	}
 
 	rulesResponse struct {
-		Data []rulesResponseValue
-		Meta rulesResponseMeta
+		Data   []rulesResponseValue
+		Meta   rulesResponseMeta
 		Errors []rulesResponseError
 	}
 
@@ -32,9 +33,9 @@ type (
 	}
 	rulesResponseError struct {
 		Value string `json:"value"`
-		Id string `json:"id"`
+		Id    string `json:"id"`
 		Title string `json:"title"`
-		Type string `json:"type"`
+		Type  string `json:"type"`
 	}
 
 	addRulesResponseMetaSummary struct {
@@ -43,7 +44,7 @@ type (
 	}
 )
 
-func newRules(httpClient IHttpClient) *rules {
+func newRules(httpClient httpclient.IHttpClient) *rules {
 	return &rules{httpClient: httpClient}
 }
 
@@ -51,7 +52,7 @@ func newRules(httpClient IHttpClient) *rules {
 // The body is a stringified object.
 // Learn about the possible error messages returned here https://developer.twitter.com/en/support/twitter-api/error-troubleshooting.
 func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
-	res, err := t.httpClient.addRules(func() string {
+	res, err := t.httpClient.AddRules(func() string {
 		if dryRun {
 			return "?dry_run=true"
 		} else {
@@ -75,7 +76,7 @@ func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 
 // GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
 func (t *rules) GetRules() (*rulesResponse, error) {
-	res, err := t.httpClient.getRules()
+	res, err := t.httpClient.GetRules()
 
 	if err != nil {
 		return nil, err
