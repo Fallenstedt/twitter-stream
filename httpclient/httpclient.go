@@ -1,19 +1,16 @@
 package httpclient
 
-
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
 	"log"
-	"math"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type twitterEndpoints map[string]string
 
+// Endpoints is a map of twitter endpoints used to manage rules and streams.
 var Endpoints = make(twitterEndpoints)
 
 type (
@@ -29,19 +26,9 @@ type (
 	httpClient struct {
 		token string
 	}
-
-	RequestOpts struct {
-		Retries uint8
-		Method  string
-		Url     string
-		Body    string
-		Headers []struct {
-			Key   string
-			Value string
-		}
-	}
 )
 
+// NewHttpClient constructs a an HttpClient to interact with twitter.
 func NewHttpClient(token string) *httpClient {
 	Endpoints["rules"] = "https://api.twitter.com/2/tweets/search/stream/rules"
 	Endpoints["stream"] = "https://api.twitter.com/2/tweets/search/stream"
@@ -49,6 +36,7 @@ func NewHttpClient(token string) *httpClient {
 	return &httpClient{token}
 }
 
+// GetRules will return the current rules available for a specific API key.
 func (t *httpClient) GetRules() (*http.Response, error) {
 	res, err := t.NewHttpRequest(&RequestOpts{
 		Method: "GET",
@@ -59,6 +47,7 @@ func (t *httpClient) GetRules() (*http.Response, error) {
 	return res, err
 }
 
+// AddRules will add rules for you to stream with.
 func (t *httpClient) AddRules(queryParams string, body string) (*http.Response, error) {
 	url, err := t.GenerateUrl("rules", queryParams)
 
@@ -79,6 +68,7 @@ func (t *httpClient) AddRules(queryParams string, body string) (*http.Response, 
 	return res, nil
 }
 
+// GetSearchStream will start the stream with twitter.
 func (t *httpClient) GetSearchStream(queryParams string) (*http.Response, error) {
 	// Make an HTTP GET request to GET /2/tweets/search/stream
 	url, err := t.GenerateUrl("stream", queryParams)
@@ -99,6 +89,7 @@ func (t *httpClient) GetSearchStream(queryParams string) (*http.Response, error)
 	return res, nil
 }
 
+// GenerateUrl is a utility function for httpclient package to generate a valid url for api.twitter.
 func (t *httpClient) GenerateUrl(name string, queryParams string) (string, error) {
 	var url string
 	if len(queryParams) > 0 {
@@ -114,8 +105,8 @@ func (t *httpClient) GenerateUrl(name string, queryParams string) (string, error
 	}
 }
 
+// NewHttpRequest performs an authenticated http request with twitter with the token this httpclient has.
 func (t *httpClient) NewHttpRequest(opts *RequestOpts) (*http.Response, error) {
-	client := &http.Client{}
 
 	var req *http.Request
 	var err error
@@ -145,40 +136,14 @@ func (t *httpClient) NewHttpRequest(opts *RequestOpts) (*http.Response, error) {
 	}
 
 	// Perform network request
+	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Failed to perform request for %s: %v", opts.Url, err)
 		return nil, err
 	}
 
-	// Retry with backoff if 429
-	if resp.StatusCode == 429 {
-		log.Printf("Retrying network request %s with backoff", opts.Url)
+	responseParser := new(httpResponseParser)
+	return responseParser.handleResponse(resp, opts, t.NewHttpRequest)
 
-		delay := t.getBackOffTime(opts.Retries)
-		log.Printf("Sleeping for %v seconds", delay)
-		time.Sleep(delay)
-
-		opts.Retries += 1
-		return t.NewHttpRequest(opts)
-	}
-
-	// Reject if 400 or greater
-	if resp.StatusCode >= 400 {
-		log.Printf("Network Request at %s failed: %v", opts.Url, resp.StatusCode)
-		body, _ := ioutil.ReadAll(resp.Body)
-		msg := "Network request failed: " + string(body)
-		return nil, errors.New(msg)
-	}
-
-	return resp, nil
-}
-
-func (t *httpClient) getBackOffTime(retries uint8) time.Duration {
-	exponentialBackoffCeilingSecs := 30
-	delaySecs := int(math.Floor((math.Pow(2, float64(retries)) - 1) * 0.5))
-	if delaySecs > exponentialBackoffCeilingSecs {
-		delaySecs = 30
-	}
-	return time.Duration(delaySecs) * time.Second
 }
