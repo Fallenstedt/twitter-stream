@@ -29,7 +29,7 @@ type (
 )
 
 // NewHttpClient constructs a an HttpClient to interact with twitter.
-func NewHttpClient(token string) *httpClient {
+func NewHttpClient(token string) IHttpClient {
 	Endpoints["rules"] = "https://api.twitter.com/2/tweets/search/stream/rules"
 	Endpoints["stream"] = "https://api.twitter.com/2/tweets/search/stream"
 	Endpoints["token"] = "https://api.twitter.com/oauth2/token"

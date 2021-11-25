@@ -22,7 +22,7 @@ func TestSetApiKeyAndSecret(t *testing.T) {
 	for i, tt := range tests {
 		testName := fmt.Sprintf("(%d) %s %s", i, tt.apiKey, tt.apiSecret)
 		t.Run(testName, func(t *testing.T) {
-			result := newTokenGenerator(httpclient.NewHttpClientMock(""))
+			result := &tokenGenerator{httpClient: httpclient.NewHttpClientMock("")}
 			result.SetApiKeyAndSecret(tt.apiKey, tt.apiSecret)
 
 			if result.apiKey != tt.result.apiKey {
@@ -39,7 +39,7 @@ func TestSetApiKeyAndSecret(t *testing.T) {
 func TestRequestBearerToken(t *testing.T) {
 	var tests = []struct {
 		mockRequest func(opts *httpclient.RequestOpts) (*http.Response, error)
-		result      *requestBearerTokenResponse
+		result      *RequestBearerTokenResponse
 	}{
 		{func(opts *httpclient.RequestOpts) (*http.Response, error) {
 
@@ -55,7 +55,7 @@ func TestRequestBearerToken(t *testing.T) {
 				Body:       body,
 			}, nil
 		},
-			&requestBearerTokenResponse{
+			&RequestBearerTokenResponse{
 				TokenType:   "bearer",
 				AccessToken: "123Token456",
 			}},
