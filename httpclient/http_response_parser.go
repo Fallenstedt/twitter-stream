@@ -18,6 +18,15 @@ func (h httpResponseParser) handleResponse(resp *http.Response, opts *RequestOpt
 	if resp.StatusCode == 429 {
 		log.Printf("Retrying network request %s with backoff", opts.Url)
 
+		var msg string
+		if resp.Body != nil {
+			body, _ := ioutil.ReadAll(resp.Body)
+			msg = "Network request failed: " + string(body)
+		} else {
+			msg = "Network request failed with status: " + fmt.Sprint(resp.StatusCode)
+		}
+		log.Printf(msg)
+
 		delay := h.getBackOffTime(opts.Retries)
 		log.Printf("Sleeping for %v seconds", delay)
 		time.Sleep(delay)

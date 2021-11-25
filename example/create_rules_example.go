@@ -1,23 +1,20 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	twitterstream "github.com/fallenstedt/twitter-stream"
-	"log"
 	"time"
 )
 
 const key = "YOUR_KEY"
 const secret = "YOUR_SECRET"
 
-
 func main() {
-	// Use your favorite function from below here
- 	startStream()
+
  	addRules()
  	getRules()
-	deleteRules()
+ 	// You can delete the rules created in this example
+ 	//deleteRules()
 }
 
 type StreamData struct {
@@ -35,56 +32,11 @@ type StreamData struct {
 		} `json:"users"`
 	} `json:"includes"`
 	MatchingRules []struct {
-		ID  int64  `json:"id"`
+		ID  string  `json:"id"`
 		Tag string `json:"tag"`
 	} `json:"matching_rules"`
 }
 
-
-
-func startStream() {
-	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
-
-	if err != nil {
-		panic(err)
-	}
-
-	api := twitterstream.NewTwitterStream(tok.AccessToken)
-	// It is encouraged you unmarashal json with twitterstream's unmarshal hook. This is a thread-safe
-	// way to unmarshal json
-	api.Stream.SetUnmarshalHook(func(bytes []byte) (interface{}, error) {
-		data := StreamData{}
-		if err := json.Unmarshal(bytes, &data); err != nil {
-			log.Printf("Failed to unmarshal bytes: %v", err)
-		}
-		return data, err
-	})
-	defer  api.Stream.StopStream()
-
-	err = api.Stream.StartStream("?expansions=author_id&tweet.fields=created_at")
-
-	if err != nil {
-		panic(err)
-	}
-
-	go func() {
-		for message := range api.Stream.GetMessages() {
-			if message.Err != nil {
-				panic(message.Err)
-			}
-
-			// Type assertion
-			tweet, ok := message.Data.(StreamData)
-			if !ok {
-				continue
-			}
-
-			fmt.Println(tweet.Data.Text)
-		}
-	}()
-
-	time.Sleep(time.Second * 30)
-}
 
 func addRules() {
 	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
@@ -96,7 +48,7 @@ func addRules() {
 		"add": [
 				{"value": "cat has:images", "tag": "cat tweets with images"}
 			]
-		}`, true) // dryRun is set to true
+		}`, false) // dryRun is set to false.
 
 	if err != nil {
 		panic(err)
@@ -144,7 +96,7 @@ func deleteRules() {
 		"delete": {
 				"ids": ["1234567890"]
 			}
-		}`, true)
+		}`, false)
 
 	if err != nil {
 		panic(err)
