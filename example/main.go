@@ -104,7 +104,7 @@ func addRules() {
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
 	fmt.Println("I have created this many rules: ")
@@ -125,7 +125,7 @@ func getRules() {
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
 	fmt.Println(res.Data)
@@ -152,7 +152,7 @@ func deleteRules() {
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
 	fmt.Println(res)
