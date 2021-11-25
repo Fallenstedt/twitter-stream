@@ -9,7 +9,7 @@ type TwitterApi struct {
 }
 
 
-// NewTokenGenerator creates a tokenGenerator which can request a Bearer token using a twitter api key and secret.
+// NewTokenGenerator creates a TokenGenerator which can request a Bearer token using a twitter api key and secret.
 func NewTokenGenerator() ITokenGenerator {
 	client := httpclient.NewHttpClient("")
 	tokenGenerator := newTokenGenerator(client)

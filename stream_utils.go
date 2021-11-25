@@ -38,7 +38,7 @@ type (
 
 // newStreamResponseBodyReader returns an instance of streamResponseBodyReader
 // for the given Twitter stream response body.
-func newStreamResponseBodyReader() *streamResponseBodyReader {
+func newStreamResponseBodyReader() IStreamResponseBodyReader {
 	return &streamResponseBodyReader{}
 }
 
