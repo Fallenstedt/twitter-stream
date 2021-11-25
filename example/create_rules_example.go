@@ -3,40 +3,16 @@ package main
 import (
 	"fmt"
 	twitterstream "github.com/fallenstedt/twitter-stream"
-	"time"
 )
 
 const key = "YOUR_KEY"
 const secret = "YOUR_SECRET"
 
 func main() {
-
  	addRules()
  	getRules()
- 	// You can delete the rules created in this example
- 	//deleteRules()
+ 	deleteRules()
 }
-
-type StreamData struct {
-	Data struct {
-		Text      string    `json:"text"`
-		ID        string    `json:"id"`
-		CreatedAt time.Time `json:"created_at"`
-		AuthorID  string    `json:"author_id"`
-	} `json:"data"`
-	Includes struct {
-		Users []struct {
-			ID       string `json:"id"`
-			Name     string `json:"name"`
-			Username string `json:"username"`
-		} `json:"users"`
-	} `json:"includes"`
-	MatchingRules []struct {
-		ID  string  `json:"id"`
-		Tag string `json:"tag"`
-	} `json:"matching_rules"`
-}
-
 
 func addRules() {
 	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
