@@ -125,7 +125,7 @@ Use the `Rules` struct to access different Rules endpoints as defined in [Twitte
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
 	fmt.Println(res.Data)
@@ -145,7 +145,7 @@ Use the `Rules` struct to access different Rules endpoints as defined in [Twitte
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 ```
 ##### Delete Rules
@@ -163,7 +163,7 @@ Use the `Rules` struct to access different Rules endpoints as defined in [Twitte
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
 ```
