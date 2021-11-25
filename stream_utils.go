@@ -9,7 +9,6 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	"time"
 )
 
 // stopped returns true if the done channel receives, false otherwise.
@@ -19,20 +18,6 @@ func stopped(done <-chan struct{}) bool {
 		return true
 	default:
 		return false
-	}
-}
-
-// sleepOrDone pauses the current goroutine until the done channel receives
-// or until at least the duration d has elapsed, whichever comes first. This
-// is similar to time.Sleep(d), except it can be interrupted.
-func sleepOrDone(d time.Duration, done <-chan struct{}) {
-	sleep := time.NewTimer(d)
-	defer sleep.Stop()
-	select {
-	case <-sleep.C:
-		return
-	case <-done:
-		return
 	}
 }
 
@@ -53,7 +38,7 @@ type (
 
 // newStreamResponseBodyReader returns an instance of streamResponseBodyReader
 // for the given Twitter stream response body.
-func newStreamResponseBodyReader() *streamResponseBodyReader {
+func newStreamResponseBodyReader() IStreamResponseBodyReader {
 	return &streamResponseBodyReader{}
 }
 

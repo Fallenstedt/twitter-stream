@@ -36,7 +36,7 @@ type (
 	}
 )
 
-func newStream(httpClient httpclient.IHttpClient, reader IStreamResponseBodyReader) *Stream {
+func newStream(httpClient httpclient.IHttpClient, reader IStreamResponseBodyReader) IStream {
 	return &Stream{
 		unmarshalHook: func(bytes []byte) (interface{}, error) {
 			return bytes, nil

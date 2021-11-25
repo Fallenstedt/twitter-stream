@@ -7,35 +7,35 @@ import (
 )
 
 type (
-	//ITokenGenerator is the interface that tokenGenerator implements.
+	//ITokenGenerator is the interface that TokenGenerator implements.
 	ITokenGenerator interface {
-		RequestBearerToken() *requestBearerTokenResponse
-		SetApiKeyAndSecret(apiKey, apiSecret string) *tokenGenerator
+		RequestBearerToken() (*RequestBearerTokenResponse, error)
+		SetApiKeyAndSecret(apiKey, apiSecret string) ITokenGenerator
 	}
-	tokenGenerator struct {
+	TokenGenerator struct {
 		httpClient httpclient.IHttpClient
 		apiKey     string
 		apiSecret  string
 	}
-	requestBearerTokenResponse struct {
+	RequestBearerTokenResponse struct {
 		TokenType   string `json:"token_type"`
 		AccessToken string `json:"access_token"`
 	}
 )
 
-func newTokenGenerator(httpClient httpclient.IHttpClient) *tokenGenerator {
-	return &tokenGenerator{httpClient: httpClient}
+func newTokenGenerator(httpClient httpclient.IHttpClient) ITokenGenerator {
+	return &TokenGenerator{httpClient: httpClient}
 }
 
-// SetApiKeyAndSecret sets the apiKey and apiSecret fields for the tokenGenerator instance.
-func (a *tokenGenerator) SetApiKeyAndSecret(apiKey, apiSecret string) *tokenGenerator {
+// SetApiKeyAndSecret sets the apiKey and apiSecret fields for the TokenGenerator instance.
+func (a *TokenGenerator) SetApiKeyAndSecret(apiKey, apiSecret string) ITokenGenerator {
 	a.apiKey = apiKey
 	a.apiSecret = apiSecret
 	return a
 }
 
 // RequestBearerToken requests a bearer token from twitter using the apiKey and apiSecret.
-func (a *tokenGenerator) RequestBearerToken() (*requestBearerTokenResponse, error) {
+func (a *TokenGenerator) RequestBearerToken() (*RequestBearerTokenResponse, error) {
 
 	resp, err := a.httpClient.NewHttpRequest(&httpclient.RequestOpts{
 		Headers: []struct {
@@ -55,12 +55,15 @@ func (a *tokenGenerator) RequestBearerToken() (*requestBearerTokenResponse, erro
 	}
 
 	defer resp.Body.Close()
-	data := new(requestBearerTokenResponse)
+	data := new(RequestBearerTokenResponse)
 	json.NewDecoder(resp.Body).Decode(data)
 
 	return data, nil
 }
 
-func (a *tokenGenerator) base64EncodeKeys() string {
+
+func (a *TokenGenerator) base64EncodeKeys() string {
+	// See Step 1 of encoding consumer key and secret twitter application-only requests here
+	// https://developer.twitter.com/en/docs/authentication/oauth-2-0/application-only
 	return base64.StdEncoding.EncodeToString([]byte(a.apiKey + ":" + a.apiSecret))
 }
