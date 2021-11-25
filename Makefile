@@ -1,6 +1,5 @@
 VERSION := $(shell cat ./VERSION)
 
-
 test:
 	go test ./...
 

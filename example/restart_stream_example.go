@@ -34,7 +34,7 @@ type StreamDataExample struct {
 		} `json:"users"`
 	} `json:"includes"`
 	MatchingRules []struct {
-		ID  string  `json:"id"`
+		ID  string `json:"id"`
 		Tag string `json:"tag"`
 	} `json:"matching_rules"`
 }
@@ -80,7 +80,7 @@ func initiateStream() {
 	fmt.Println("Stopped Stream")
 }
 
-func fetchTweets() twitterstream.IStream  {
+func fetchTweets() twitterstream.IStream {
 	tok, err := getTwitterToken()
 	if err != nil {
 		panic(err)
@@ -102,11 +102,10 @@ func fetchTweets() twitterstream.IStream  {
 	return api
 }
 
-func  getTwitterToken() (string, error) {
-	tok, err :=  twitterstream.NewTokenGenerator().SetApiKeyAndSecret(KEY, SECRET).RequestBearerToken()
+func getTwitterToken() (string, error) {
+	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(KEY, SECRET).RequestBearerToken()
 	return tok.AccessToken, err
 }
-
 
 func getTwitterStreamApi(tok string) twitterstream.IStream {
 	return twitterstream.NewTwitterStream(tok).Stream

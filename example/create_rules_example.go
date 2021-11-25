@@ -11,10 +11,10 @@ const secret = "YOUR_SECRET"
 
 func main() {
 
- 	addRules()
- 	getRules()
- 	// You can delete the rules created in this example
- 	//deleteRules()
+	addRules()
+	getRules()
+	// You can delete the rules created in this example
+	//deleteRules()
 }
 
 type StreamData struct {
@@ -32,11 +32,10 @@ type StreamData struct {
 		} `json:"users"`
 	} `json:"includes"`
 	MatchingRules []struct {
-		ID  string  `json:"id"`
+		ID  string `json:"id"`
 		Tag string `json:"tag"`
 	} `json:"matching_rules"`
 }
-
 
 func addRules() {
 	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
@@ -82,7 +81,6 @@ func getRules() {
 
 	fmt.Println(res.Data)
 }
-
 
 func deleteRules() {
 	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
