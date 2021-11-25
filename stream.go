@@ -26,7 +26,7 @@ type (
 	// Stream is the struct that manages a long running TCP connection with Twitter.
 	// It accepts an 'unamarshalHook' which allows you to unmarshal json in a thread-safe manner.
 	// It is highly encouraged to set a unmarshal hook before starting a stream. Unmarshaling json
-	// in a separate goroutine is not recommended because the Go bytes.Buffer is not thread safe.
+	// in a separate goroutine is not recommended because the Go bytes.Buffer is not goroutine safe.
 	Stream struct {
 		unmarshalHook UnmarshalHook
 		messages      chan StreamMessage
@@ -85,6 +85,7 @@ func (s *Stream) StartStream(optionalQueryParams string) error {
 
 func (s *Stream) streamMessages(res *http.Response) {
 	defer res.Body.Close()
+	defer close(s.messages)
 
 	for !stopped(s.done) {
 		b, err := s.reader.readNext()

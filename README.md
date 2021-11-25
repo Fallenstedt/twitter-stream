@@ -6,7 +6,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/fallenstedt/twitter-stream)](https://goreportcard.com/report/github.com/fallenstedt/twitter-stream)
 [![Go Reference](https://pkg.go.dev/badge/github.com/fallenstedt/twitter-stream.svg)](https://pkg.go.dev/github.com/fallenstedt/twitter-stream)
 
-TwitStream is a Go library for creating streaming rules and streaming tweets with [Twitter's v2 Filtered Streaming API](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/introduction). 
+TwitterStream is a Go library for creating streaming rules and streaming tweets with [Twitter's v2 Filtered Streaming API](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/introduction). 
 See [examples](https://github.com/fallenstedt/twitter-stream/tree/master/example) to start adding your own rules and start streaming.  
 
 
@@ -70,7 +70,7 @@ You can get specific data you want by adding [query params](https://developer.tw
 Additionally, [view an example of query params here](https://developer.twitter.com/en/docs/twitter-api/expansions), or in the [examples](https://github.com/fallenstedt/twitter-stream/tree/master/example)
 
 ```go
-    err := api.Stream.StartStream("")
+    err := api.Stream.StartStream("?expansions=author_id&tweet.fields=created_at")
 
 	if err != nil {
 		panic(err)
@@ -125,7 +125,7 @@ Use the `Rules` struct to access different Rules endpoints as defined in [Twitte
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
 	fmt.Println(res.Data)
@@ -145,7 +145,7 @@ Use the `Rules` struct to access different Rules endpoints as defined in [Twitte
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 ```
 ##### Delete Rules
@@ -163,7 +163,7 @@ Use the `Rules` struct to access different Rules endpoints as defined in [Twitte
 
 	if res.Errors != nil && len(res.Errors) > 0 {
 		//https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-		panic(fmt.Sprintf("Received an error from twiiter: %v", res.Errors))
+		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
 ```
