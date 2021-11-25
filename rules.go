@@ -44,7 +44,7 @@ type (
 	}
 )
 
-func newRules(httpClient httpclient.IHttpClient) *rules {
+func newRules(httpClient httpclient.IHttpClient) IRules {
 	return &rules{httpClient: httpClient}
 }
 

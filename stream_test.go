@@ -25,7 +25,15 @@ func TestGetMessages(t *testing.T) {
 func TestStopStream(t *testing.T) {
 	client := httpclient.NewHttpClientMock("foobar")
 	reader := newStreamResponseBodyReader()
-	instance := newStream(client, reader)
+	instance := &Stream{
+		unmarshalHook: func(bytes []byte) (interface{}, error) {
+			return bytes, nil
+		},
+		messages:   make(chan StreamMessage),
+		done:       make(chan struct{}),
+		reader:     reader,
+		httpClient: client,
+	}
 
 	instance.StopStream()
 	result := <-instance.done
