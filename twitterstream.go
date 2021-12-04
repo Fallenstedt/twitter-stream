@@ -5,6 +5,7 @@ import (
 	"github.com/fallenstedt/twitter-stream/httpclient"
 	"github.com/fallenstedt/twitter-stream/rules"
 	"github.com/fallenstedt/twitter-stream/stream"
+	"github.com/fallenstedt/twitter-stream/token_generator"
 )
 
 type TwitterApi struct {
@@ -12,11 +13,10 @@ type TwitterApi struct {
 	Stream stream.IStream
 }
 
-
 // NewTokenGenerator creates a TokenGenerator which can request a Bearer token using a twitter api key and secret.
-func NewTokenGenerator() ITokenGenerator {
+func NewTokenGenerator() token_generator.ITokenGenerator {
 	client := httpclient.NewHttpClient("")
-	tokenGenerator := newTokenGenerator(client)
+	tokenGenerator := token_generator.NewTokenGenerator(client)
 	return tokenGenerator
 }
 
