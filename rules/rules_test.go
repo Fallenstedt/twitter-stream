@@ -1,4 +1,4 @@
-package twitterstream
+package rules
 
 import (
 	"bytes"
@@ -73,7 +73,7 @@ func TestAddRules(t *testing.T) {
 			mockClient := httpclient.NewHttpClientMock("sometoken")
 			mockClient.MockAddRules = tt.mockRequest
 
-			instance := newRules(mockClient)
+			instance := NewRules(mockClient)
 			result, err := instance.AddRules(tt.body, false)
 
 			if err != nil {
@@ -162,7 +162,7 @@ func TestGetRules(t *testing.T) {
 			mockClient := httpclient.NewHttpClientMock("sometoken")
 			mockClient.MockGetRules = tt.mockRequest
 
-			instance := newRules(mockClient)
+			instance := NewRules(mockClient)
 			result, err := instance.GetRules()
 
 			if err != nil {

@@ -1,4 +1,4 @@
-package twitterstream
+package rules
 
 import (
 	"encoding/json"
@@ -44,7 +44,7 @@ type (
 	}
 )
 
-func newRules(httpClient httpclient.IHttpClient) IRules {
+func NewRules(httpClient httpclient.IHttpClient) IRules {
 	return &rules{httpClient: httpClient}
 }
 
