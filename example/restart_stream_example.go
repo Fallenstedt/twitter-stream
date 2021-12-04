@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	twitterstream "github.com/fallenstedt/twitter-stream"
+	"github.com/fallenstedt/twitter-stream/stream"
 	"time"
 )
 
@@ -80,7 +81,7 @@ func initiateStream() {
 	fmt.Println("Stopped Stream")
 }
 
-func fetchTweets() twitterstream.IStream {
+func fetchTweets() stream.IStream {
 	tok, err := getTwitterToken()
 	if err != nil {
 		panic(err)
@@ -107,6 +108,6 @@ func getTwitterToken() (string, error) {
 	return tok.AccessToken, err
 }
 
-func getTwitterStreamApi(tok string) twitterstream.IStream {
+func getTwitterStreamApi(tok string) stream.IStream {
 	return twitterstream.NewTwitterStream(tok).Stream
 }

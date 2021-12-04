@@ -1,4 +1,4 @@
-package twitterstream
+package stream
 
 //
 // ❤️ Credit goes to the team at dghubble/go-twitter who originally built this code.
@@ -36,9 +36,9 @@ type (
 	}
 )
 
-// newStreamResponseBodyReader returns an instance of streamResponseBodyReader
+// NewStreamResponseBodyReader returns an instance of streamResponseBodyReader
 // for the given Twitter stream response body.
-func newStreamResponseBodyReader() IStreamResponseBodyReader {
+func NewStreamResponseBodyReader() IStreamResponseBodyReader {
 	return &streamResponseBodyReader{}
 }
 

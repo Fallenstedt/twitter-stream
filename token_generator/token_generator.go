@@ -1,4 +1,4 @@
-package twitterstream
+package token_generator
 
 import (
 	"encoding/base64"
@@ -23,7 +23,7 @@ type (
 	}
 )
 
-func newTokenGenerator(httpClient httpclient.IHttpClient) ITokenGenerator {
+func NewTokenGenerator(httpClient httpclient.IHttpClient) ITokenGenerator {
 	return &TokenGenerator{httpClient: httpClient}
 }
 

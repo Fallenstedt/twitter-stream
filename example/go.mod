@@ -1,6 +1,6 @@
 module github.com/fallenstedt/twitter-stream/example
 
-replace github.com/fallenstedt/twitter-stream => /Users/alex/Code/twitter-stream/
+replace github.com/fallenstedt/twitter-stream => ../
 
 go 1.16
 
