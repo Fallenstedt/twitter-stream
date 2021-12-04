@@ -8,42 +8,54 @@ import (
 type (
 	//IRules is the interface the rules struct implements.
 	IRules interface {
-		AddRules(body string, dryRun bool) (*rulesResponse, error)
-		GetRules() (*rulesResponse, error)
+		AddRules(body string, dryRun bool) (*TwitterRuleResponse, error)
+		GetRules() (*TwitterRuleResponse, error)
 	}
 
-	rules struct {
-		httpClient httpclient.IHttpClient
+	//AddRulesRequest
+
+	//TwitterRuleResponse is what is returned from twitter when adding or deleting a rule.
+	TwitterRuleResponse struct {
+		Data   []DataRule
+		Meta   MetaRule
+		Errors []ErrorRule
 	}
 
-	rulesResponse struct {
-		Data   []rulesResponseValue
-		Meta   rulesResponseMeta
-		Errors []rulesResponseError
-	}
-
-	rulesResponseValue struct {
+	//DataRule is what is returned as "Data" when adding or deleting a rule.
+	DataRule struct {
 		Value string `json:"value"`
 		Tag   string `json:"tag"`
 		Id    string `json:"id"`
 	}
-	rulesResponseMeta struct {
-		Sent    string                      `json:"sent"`
-		Summary addRulesResponseMetaSummary `json:"summary"`
+
+	//MetaRule is what is returned as "Meta" when adding or deleting a rule.
+	MetaRule struct {
+		Sent    string      `json:"sent"`
+		Summary MetaSummary `json:"summary"`
 	}
-	rulesResponseError struct {
+
+	//MetaSummary is what is returned as "Summary" in "Meta" when adding or deleting a rule.
+	MetaSummary struct {
+		Created    uint `json:"created"`
+		NotCreated uint `json:"not_created"`
+	}
+
+	//ErrorRule is what is returend as "Errors" when adding or deleting a rule.
+	ErrorRule struct {
 		Value string `json:"value"`
 		Id    string `json:"id"`
 		Title string `json:"title"`
 		Type  string `json:"type"`
 	}
 
-	addRulesResponseMetaSummary struct {
-		Created    uint `json:"created"`
-		NotCreated uint `json:"not_created"`
+	rules struct {
+		httpClient httpclient.IHttpClient
 	}
+
 )
 
+//NewRules creates a "rules" instance. This is used to create Twitter Filtered Stream rules.
+// https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/integrate/build-a-rule.
 func NewRules(httpClient httpclient.IHttpClient) IRules {
 	return &rules{httpClient: httpClient}
 }
@@ -51,7 +63,7 @@ func NewRules(httpClient httpclient.IHttpClient) IRules {
 // AddRules adds or deletes rules to the stream using twitter's POST /2/tweets/search/stream/rules endpoint.
 // The body is a stringified object.
 // Learn about the possible error messages returned here https://developer.twitter.com/en/support/twitter-api/error-troubleshooting.
-func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
+func (t *rules) AddRules(body string, dryRun bool) (*TwitterRuleResponse, error) {
 	res, err := t.httpClient.AddRules(func() string {
 		if dryRun {
 			return "?dry_run=true"
@@ -65,7 +77,7 @@ func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 	}
 
 	defer res.Body.Close()
-	data := new(rulesResponse)
+	data := new(TwitterRuleResponse)
 
 	err = json.NewDecoder(res.Body).Decode(data)
 	if err != nil {
@@ -75,7 +87,7 @@ func (t *rules) AddRules(body string, dryRun bool) (*rulesResponse, error) {
 }
 
 // GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
-func (t *rules) GetRules() (*rulesResponse, error) {
+func (t *rules) GetRules() (*TwitterRuleResponse, error) {
 	res, err := t.httpClient.GetRules()
 
 	if err != nil {
@@ -83,7 +95,7 @@ func (t *rules) GetRules() (*rulesResponse, error) {
 	}
 
 	defer res.Body.Close()
-	data := new(rulesResponse)
+	data := new(TwitterRuleResponse)
 	json.NewDecoder(res.Body).Decode(data)
 
 	return data, nil

@@ -14,7 +14,7 @@ func TestAddRules(t *testing.T) {
 	var tests = []struct {
 		body        string
 		mockRequest func(queryParams string, body string) (*http.Response, error)
-		result      *rulesResponse
+		result      *TwitterRuleResponse
 	}{
 		{
 			`{
@@ -46,17 +46,17 @@ func TestAddRules(t *testing.T) {
 				}, nil
 
 			},
-			&rulesResponse{
-				Data: []rulesResponseValue{
+			&TwitterRuleResponse{
+				Data: []DataRule{
 					{
 						Value: "cat has:images",
 						Tag:   "cat tweets with images",
 						Id:    "123456",
 					},
 				},
-				Meta: rulesResponseMeta{
+				Meta: MetaRule{
 					Sent: "today",
-					Summary: addRulesResponseMetaSummary{
+					Summary: MetaSummary{
 						Created:    1,
 						NotCreated: 0,
 					},
@@ -110,7 +110,7 @@ func TestAddRules(t *testing.T) {
 func TestGetRules(t *testing.T) {
 	var tests = []struct {
 		mockRequest func() (*http.Response, error)
-		result      *rulesResponse
+		result      *TwitterRuleResponse
 	}{
 		{
 			func() (*http.Response, error) {
@@ -136,17 +136,17 @@ func TestGetRules(t *testing.T) {
 				}, nil
 
 			},
-			&rulesResponse{
-				Data: []rulesResponseValue{
+			&TwitterRuleResponse{
+				Data: []DataRule{
 					{
 						Value: "cat has:images",
 						Tag:   "cat tweets with images",
 						Id:    "123456",
 					},
 				},
-				Meta: rulesResponseMeta{
+				Meta: MetaRule{
 					Sent: "today",
-					Summary: addRulesResponseMetaSummary{
+					Summary: MetaSummary{
 						Created:    0,
 						NotCreated: 1,
 					},
