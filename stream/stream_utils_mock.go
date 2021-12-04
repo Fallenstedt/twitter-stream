@@ -1,4 +1,4 @@
-package twitterstream
+package stream
 
 import (
 	"io"

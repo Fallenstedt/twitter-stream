@@ -4,11 +4,12 @@ package twitterstream
 import (
 	"github.com/fallenstedt/twitter-stream/httpclient"
 	"github.com/fallenstedt/twitter-stream/rules"
+	"github.com/fallenstedt/twitter-stream/stream"
 )
 
 type TwitterApi struct {
 	Rules  rules.IRules
-	Stream IStream
+	Stream stream.IStream
 }
 
 
@@ -24,6 +25,6 @@ func NewTokenGenerator() ITokenGenerator {
 func NewTwitterStream(token string) *TwitterApi {
 	client := httpclient.NewHttpClient(token)
 	rules := rules.NewRules(client)
-	stream := newStream(client, newStreamResponseBodyReader())
+	stream := stream.NewStream(client, stream.NewStreamResponseBodyReader())
 	return &TwitterApi{Rules: rules, Stream: stream}
 }

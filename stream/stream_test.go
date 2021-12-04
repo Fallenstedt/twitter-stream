@@ -1,4 +1,4 @@
-package twitterstream
+package stream
 
 import (
 	"bytes"
@@ -12,8 +12,8 @@ import (
 
 func TestGetMessages(t *testing.T) {
 	client := httpclient.NewHttpClientMock("foobar")
-	reader := newStreamResponseBodyReader()
-	instance := newStream(client, reader)
+	reader := NewStreamResponseBodyReader()
+	instance := NewStream(client, reader)
 
 	messages := instance.GetMessages()
 
@@ -24,7 +24,7 @@ func TestGetMessages(t *testing.T) {
 
 func TestStopStream(t *testing.T) {
 	client := httpclient.NewHttpClientMock("foobar")
-	reader := newStreamResponseBodyReader()
+	reader := NewStreamResponseBodyReader()
 	instance := &Stream{
 		unmarshalHook: func(bytes []byte) (interface{}, error) {
 			return bytes, nil
@@ -79,7 +79,7 @@ func TestStartStream(t *testing.T) {
 		testName := fmt.Sprintf("TestStartStream (%d)", i)
 
 		t.Run(testName, func(t *testing.T) {
-			instance := newStream(
+			instance := NewStream(
 				tt.givenMockHttpRequestToStreamReturns(),
 				tt.givenMockStreamResponseBodyReader(),
 			)
