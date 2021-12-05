@@ -9,6 +9,7 @@ type (
 	//IRules is the interface the rules struct implements.
 	IRules interface {
 		AddRules(body string, dryRun bool) (*TwitterRuleResponse, error)
+		Create(rules []*RuleValue, dryRun bool) (*TwitterRuleResponse, error)
 		GetRules() (*TwitterRuleResponse, error)
 	}
 
@@ -23,8 +24,8 @@ type (
 
 	//DataRule is what is returned as "Data" when adding or deleting a rule.
 	DataRule struct {
-		Value string `json:"value"`
-		Tag   string `json:"tag"`
+		Value string `json:"Value"`
+		Tag   string `json:"Tag"`
 		Id    string `json:"id"`
 	}
 
@@ -40,14 +41,17 @@ type (
 		NotCreated uint `json:"not_created"`
 	}
 
-	//ErrorRule is what is returend as "Errors" when adding or deleting a rule.
+	//ErrorRule is what is returned as "Errors" when adding or deleting a rule.
 	ErrorRule struct {
-		Value string `json:"value"`
+		Value string `json:"Value"`
 		Id    string `json:"id"`
 		Title string `json:"title"`
 		Type  string `json:"type"`
 	}
 
+	addRulesRequest struct {
+		Add []*RuleValue `json:"add"`
+	}
 	rules struct {
 		httpClient httpclient.IHttpClient
 	}
@@ -60,6 +64,33 @@ func NewRules(httpClient httpclient.IHttpClient) IRules {
 	return &rules{httpClient: httpClient}
 }
 
+func (t *rules) Create(rules []*RuleValue, dryRun bool) (*TwitterRuleResponse, error) {
+	add := addRulesRequest{Add: rules}
+	body, err := json.Marshal(add)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := t.httpClient.AddRules(func() string {
+		if dryRun {
+			return "?dry_run=true"
+		} else {
+			return ""
+		}
+	}(), string(body))
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	data := new(TwitterRuleResponse)
+
+	err = json.NewDecoder(res.Body).Decode(data)
+	return data, err
+}
+
+// Deprecated: Use Create instead.
 // AddRules adds or deletes rules to the stream using twitter's POST /2/tweets/search/stream/rules endpoint.
 // The body is a stringified object.
 // Learn about the possible error messages returned here https://developer.twitter.com/en/support/twitter-api/error-troubleshooting.

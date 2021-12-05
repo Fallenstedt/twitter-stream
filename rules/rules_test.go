@@ -19,14 +19,14 @@ func TestAddRules(t *testing.T) {
 		{
 			`{
 				"add": [
-					{"value": "cat has:images", "tag": "cat tweets with images"}
+					{"Value": "cat has:images", "Tag": "cat tweets with images"}
 				]
 			}`,
 			func(queryParams string, bodyRequest string) (*http.Response, error) {
 				json := `{
 					"data": [{
-						"value": "cat has:images", 
-						"tag":"cat tweets with images", 
+						"Value": "cat has:images", 
+						"Tag":"cat tweets with images", 
 						"id": "123456"
 					}],
 					"meta": {
@@ -116,8 +116,8 @@ func TestGetRules(t *testing.T) {
 			func() (*http.Response, error) {
 				json := `{
 					"data": [{
-						"value": "cat has:images", 
-						"tag":"cat tweets with images", 
+						"Value": "cat has:images", 
+						"Tag":"cat tweets with images", 
 						"id": "123456"
 					}],
 					"meta": {

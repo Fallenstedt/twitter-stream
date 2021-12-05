@@ -1,63 +1,49 @@
 package rules
 
-import "fmt"
+type  (
+	IRuleBuilder interface {
+		AddRule(value string, tag string) *RuleBuilder
+		Build() []*RuleValue
+	}
 
-type IRuleBuilder interface {
-	Build() string
-	WithValueAndTag(value string, tag string) string
-	AddKeyword(keyword string) *RuleBuilder
-	FilterKeyword(keyword string) *RuleBuilder
-	AddExactPhrase(phrase string) *RuleBuilder
-	FilterExactPhrase(phrase string) *RuleBuilder
+	RuleValue struct {
+		Value *string `json:"value,omitempty"`
+		Tag   *string `json:"tag,omitempty"`
+	}
 
-}
+	RuleBuilder struct {
+		rules []*RuleValue
+	}
+)
 
-type RuleBuilder struct {
-	keywords []string
-	filterkeywords []string
-	exactphrase []string
-	filterexactphrase []string
-}
-
-func NewRuleBuilder() IRuleBuilder {
+func NewRuleBuilder() *RuleBuilder {
 	return &RuleBuilder{
-		keywords: []string{},
-		filterkeywords: []string{},
-		exactphrase: []string{},
-		filterexactphrase: []string{},
+		rules: []*RuleValue{},
 	}
 }
 
-func (r *RuleBuilder) Build() string {
-	return "lol"
-}
-
-func (r *RuleBuilder) WithValueAndTag(value string, tag string) string {
-	return fmt.Sprintf("%v %v", value, tag)
-}
-
-func (r *RuleBuilder) AddKeyword(keyword string) *RuleBuilder {
-	r.keywords = append(r.keywords, keyword)
+//AddRule will create a rule to be build for filtered-stream.
+//Read more about rule limitations here https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/introduction.
+func (r *RuleBuilder) AddRule(value string, tag string) *RuleBuilder {
+	rule := newRuleValue().setValueTag(value, tag)
+	r.rules = append(r.rules, rule)
 	return r
 }
 
-func (r *RuleBuilder) FilterKeyword(keyword string) *RuleBuilder {
-	r.filterkeywords = append(r.filterkeywords, negate(keyword))
-	return r
+func (r *RuleBuilder) Build() []*RuleValue {
+	return r.rules
 }
 
-func (r *RuleBuilder) AddExactPhrase(phrase string) *RuleBuilder {
-	r.exactphrase = append(r.exactphrase, phrase)
-	return r
+func newRuleValue() *RuleValue {
+	return &RuleValue{
+		Value: nil,
+		Tag:   nil,
+	}
 }
 
-func (r *RuleBuilder) FilterExactPhrase(phrase string) *RuleBuilder {
-	r.exactphrase = append(r.exactphrase, negate(phrase))
+func (r *RuleValue) setValueTag(value string, tag string) *RuleValue {
+	r.Value = &value
+	r.Tag = &tag
 	return r
-}
-
-func negate(s string) string {
-	ns := fmt.Sprintf("-%v", s)
-	return ns
 }
 

@@ -10,21 +10,23 @@ const secret = "YOUR_SECRET"
 
 func main() {
  	addRules()
- 	getRules()
- 	deleteRules()
+ 	//getRules()
+ 	//deleteRules()
 }
 
 func addRules() {
+
 	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
 	if err != nil {
 		panic(err)
 	}
 	api := twitterstream.NewTwitterStream(tok.AccessToken)
-	res, err := api.Rules.AddRules(`{
-		"add": [
-				{"value": "cat has:images", "tag": "cat tweets with images"}
-			]
-		}`, false) // dryRun is set to false.
+	rules := twitterstream.NewRuleBuilder().
+		AddRule("puppies has:images", "puppy tweets with images").
+		AddRule("lang:en -is:retweet -is:quote (#golangjobs OR #gojobs)", "golang jobs").
+		Build()
+
+	res, err := api.Rules.Create(rules, true) // dryRun is set to false.
 
 	if err != nil {
 		panic(err)
