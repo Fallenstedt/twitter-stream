@@ -8,8 +8,7 @@ import (
 type (
 	//IRules is the interface the rules struct implements.
 	IRules interface {
-		AddRules(body string, dryRun bool) (*TwitterRuleResponse, error)
-		Create(rules []*RuleValue, dryRun bool) (*TwitterRuleResponse, error)
+		Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleResponse, error)
 		GetRules() (*TwitterRuleResponse, error)
 	}
 
@@ -49,9 +48,6 @@ type (
 		Type  string `json:"type"`
 	}
 
-	addRulesRequest struct {
-		Add []*RuleValue `json:"add"`
-	}
 	rules struct {
 		httpClient httpclient.IHttpClient
 	}
@@ -64,9 +60,8 @@ func NewRules(httpClient httpclient.IHttpClient) IRules {
 	return &rules{httpClient: httpClient}
 }
 
-func (t *rules) Create(rules []*RuleValue, dryRun bool) (*TwitterRuleResponse, error) {
-	add := addRulesRequest{Add: rules}
-	body, err := json.Marshal(add)
+func (t *rules) Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleResponse, error) {
+	body, err := json.Marshal(rules)
 	if err != nil {
 		return nil, err
 	}
@@ -90,32 +85,6 @@ func (t *rules) Create(rules []*RuleValue, dryRun bool) (*TwitterRuleResponse, e
 	return data, err
 }
 
-// Deprecated: Use Create instead.
-// AddRules adds or deletes rules to the stream using twitter's POST /2/tweets/search/stream/rules endpoint.
-// The body is a stringified object.
-// Learn about the possible error messages returned here https://developer.twitter.com/en/support/twitter-api/error-troubleshooting.
-func (t *rules) AddRules(body string, dryRun bool) (*TwitterRuleResponse, error) {
-	res, err := t.httpClient.AddRules(func() string {
-		if dryRun {
-			return "?dry_run=true"
-		} else {
-			return ""
-		}
-	}(), body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	data := new(TwitterRuleResponse)
-
-	err = json.NewDecoder(res.Body).Decode(data)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
-}
 
 // GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
 func (t *rules) GetRules() (*TwitterRuleResponse, error) {
@@ -131,3 +100,18 @@ func (t *rules) GetRules() (*TwitterRuleResponse, error) {
 
 	return data, nil
 }
+
+func (t *rules) GetRulesI() (*TwitterRuleResponse, error) {
+	res, err := t.httpClient.GetRules()
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	data := new(TwitterRuleResponse)
+	json.NewDecoder(res.Body).Decode(data)
+
+	return data, nil
+}
+

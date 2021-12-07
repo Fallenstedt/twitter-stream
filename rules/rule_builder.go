@@ -3,7 +3,7 @@ package rules
 type  (
 	IRuleBuilder interface {
 		AddRule(value string, tag string) *RuleBuilder
-		Build() []*RuleValue
+		Build() CreateRulesRequest
 	}
 
 	RuleValue struct {
@@ -14,6 +14,11 @@ type  (
 	RuleBuilder struct {
 		rules []*RuleValue
 	}
+
+	CreateRulesRequest struct {
+		Add []*RuleValue `json:"add"`
+	}
+
 )
 
 func NewRuleBuilder() *RuleBuilder {
@@ -30,8 +35,9 @@ func (r *RuleBuilder) AddRule(value string, tag string) *RuleBuilder {
 	return r
 }
 
-func (r *RuleBuilder) Build() []*RuleValue {
-	return r.rules
+func (r *RuleBuilder) Build() CreateRulesRequest {
+	add := CreateRulesRequest{Add: r.rules}
+	return add
 }
 
 func newRuleValue() *RuleValue {
