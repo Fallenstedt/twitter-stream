@@ -10,7 +10,7 @@ type (
 	IRules interface {
 		Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleResponse, error)
 		Delete(req DeleteRulesRequest, dryRun bool) (*TwitterRuleResponse, error)
-		GetRules() (*TwitterRuleResponse, error)
+		Get() (*TwitterRuleResponse, error)
 	}
 
 	//AddRulesRequest
@@ -61,6 +61,7 @@ func NewRules(httpClient httpclient.IHttpClient) IRules {
 	return &rules{httpClient: httpClient}
 }
 
+// Create will create new twitter streaming rules.
 func (t *rules) Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleResponse, error) {
 	body, err := json.Marshal(rules)
 	if err != nil {
@@ -85,7 +86,7 @@ func (t *rules) Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleRespo
 	err = json.NewDecoder(res.Body).Decode(data)
 	return data, err
 }
-
+// Delete will delete rules twitter rules by their id.
 func (t *rules) Delete(req DeleteRulesRequest, dryRun bool) (*TwitterRuleResponse, error) {
 
 	body, err := json.Marshal(req)
@@ -111,8 +112,8 @@ func (t *rules) Delete(req DeleteRulesRequest, dryRun bool) (*TwitterRuleRespons
 }
 
 
-// GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
-func (t *rules) GetRules() (*TwitterRuleResponse, error) {
+// Get will fetch the current rules.
+func (t *rules) Get() (*TwitterRuleResponse, error) {
 	res, err := t.httpClient.GetRules()
 
 	if err != nil {
