@@ -40,7 +40,7 @@ type StreamDataExample struct {
 	} `json:"matching_rules"`
 }
 
-func main() {
+func main2() {
 	// This will run forever
 	initiateStream()
 }

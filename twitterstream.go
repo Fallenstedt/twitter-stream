@@ -20,6 +20,10 @@ func NewTokenGenerator() token_generator.ITokenGenerator {
 	return tokenGenerator
 }
 
+func NewRuleBuilder() rules.IRuleBuilder {
+	return rules.NewRuleBuilder()
+}
+
 // NewTwitterStream consumes a twitter Bearer token.
 // It is used to interact with Twitter's v2 filtered streaming API
 func NewTwitterStream(token string) *TwitterApi {

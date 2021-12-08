@@ -9,24 +9,20 @@ import (
 	"testing"
 )
 
-func TestAddRules(t *testing.T) {
+func TestCreate(t *testing.T) {
 
 	var tests = []struct {
-		body        string
+		body        CreateRulesRequest
 		mockRequest func(queryParams string, body string) (*http.Response, error)
-		result      *rulesResponse
+		result      *TwitterRuleResponse
 	}{
 		{
-			`{
-				"add": [
-					{"value": "cat has:images", "tag": "cat tweets with images"}
-				]
-			}`,
+			NewRuleBuilder().AddRule("cat has:images", "cat tweets with images").Build(),
 			func(queryParams string, bodyRequest string) (*http.Response, error) {
 				json := `{
 					"data": [{
-						"value": "cat has:images", 
-						"tag":"cat tweets with images", 
+						"Value": "cat has:images", 
+						"Tag":"cat tweets with images", 
 						"id": "123456"
 					}],
 					"meta": {
@@ -46,17 +42,17 @@ func TestAddRules(t *testing.T) {
 				}, nil
 
 			},
-			&rulesResponse{
-				Data: []rulesResponseValue{
+			&TwitterRuleResponse{
+				Data: []DataRule{
 					{
 						Value: "cat has:images",
 						Tag:   "cat tweets with images",
 						Id:    "123456",
 					},
 				},
-				Meta: rulesResponseMeta{
+				Meta: MetaRule{
 					Sent: "today",
-					Summary: addRulesResponseMetaSummary{
+					Summary: MetaSummary{
 						Created:    1,
 						NotCreated: 0,
 					},
@@ -67,14 +63,14 @@ func TestAddRules(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		testName := fmt.Sprintf("TestAddRules (%d) %s", i, tt.body)
+		testName := fmt.Sprintf("TestCreate (%d)", i)
 
 		t.Run(testName, func(t *testing.T) {
 			mockClient := httpclient.NewHttpClientMock("sometoken")
 			mockClient.MockAddRules = tt.mockRequest
 
 			instance := NewRules(mockClient)
-			result, err := instance.AddRules(tt.body, false)
+			result, err := instance.Create(tt.body, false)
 
 			if err != nil {
 				t.Errorf("got err %v", err)
@@ -107,18 +103,22 @@ func TestAddRules(t *testing.T) {
 	}
 }
 
-func TestGetRules(t *testing.T) {
+
+func TestDelete(t *testing.T) {
+
 	var tests = []struct {
-		mockRequest func() (*http.Response, error)
-		result      *rulesResponse
+		body        DeleteRulesRequest
+		mockRequest func(queryParams string, body string) (*http.Response, error)
+		result      *TwitterRuleResponse
 	}{
 		{
-			func() (*http.Response, error) {
+			NewDeleteRulesRequest(123),
+			func(queryParams string, bodyRequest string) (*http.Response, error) {
 				json := `{
 					"data": [{
-						"value": "cat has:images", 
-						"tag":"cat tweets with images", 
-						"id": "123456"
+						"Value": "cat has:images", 
+						"Tag":"cat tweets with images", 
+						"id": "123"
 					}],
 					"meta": {
 						"sent": "today",
@@ -126,7 +126,8 @@ func TestGetRules(t *testing.T) {
 							"created": 0,
 							"not_created": 1
 						}
-					}
+					},
+					"errors": []
 				}`
 
 				body := ioutil.NopCloser(bytes.NewReader([]byte(json)))
@@ -136,34 +137,35 @@ func TestGetRules(t *testing.T) {
 				}, nil
 
 			},
-			&rulesResponse{
-				Data: []rulesResponseValue{
+			&TwitterRuleResponse{
+				Data: []DataRule{
 					{
 						Value: "cat has:images",
 						Tag:   "cat tweets with images",
-						Id:    "123456",
+						Id:    "123",
 					},
 				},
-				Meta: rulesResponseMeta{
+				Meta: MetaRule{
 					Sent: "today",
-					Summary: addRulesResponseMetaSummary{
+					Summary: MetaSummary{
 						Created:    0,
 						NotCreated: 1,
 					},
 				},
+				Errors: nil,
 			},
 		},
 	}
 
 	for i, tt := range tests {
-		testName := fmt.Sprintf("TestGetRules (%d)", i)
+		testName := fmt.Sprintf("TestCreate (%d)", i)
 
 		t.Run(testName, func(t *testing.T) {
 			mockClient := httpclient.NewHttpClientMock("sometoken")
-			mockClient.MockGetRules = tt.mockRequest
+			mockClient.MockAddRules = tt.mockRequest
 
 			instance := NewRules(mockClient)
-			result, err := instance.GetRules()
+			result, err := instance.Delete(tt.body, false)
 
 			if err != nil {
 				t.Errorf("got err %v", err)
@@ -194,5 +196,94 @@ func TestGetRules(t *testing.T) {
 			}
 		})
 	}
+}
 
+
+func TestGetRules(t *testing.T) {
+	var tests = []struct {
+		mockRequest func() (*http.Response, error)
+		result      *TwitterRuleResponse
+	}{
+		{
+			func() (*http.Response, error) {
+				json := `{
+					"data": [{
+						"Value": "cat has:images", 
+						"Tag":"cat tweets with images", 
+						"id": "123456"
+					}],
+					"meta": {
+						"sent": "today",
+						"summary": {
+							"created": 0,
+							"not_created": 1
+						}
+					}
+				}`
+
+				body := ioutil.NopCloser(bytes.NewReader([]byte(json)))
+				return &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       body,
+				}, nil
+
+			},
+			&TwitterRuleResponse{
+				Data: []DataRule{
+					{
+						Value: "cat has:images",
+						Tag:   "cat tweets with images",
+						Id:    "123456",
+					},
+				},
+				Meta: MetaRule{
+					Sent: "today",
+					Summary: MetaSummary{
+						Created:    0,
+						NotCreated: 1,
+					},
+				},
+			},
+		},
+	}
+
+	for i, tt := range tests {
+		testName := fmt.Sprintf("TestGetRules (%d)", i)
+
+		t.Run(testName, func(t *testing.T) {
+			mockClient := httpclient.NewHttpClientMock("sometoken")
+			mockClient.MockGetRules = tt.mockRequest
+
+			instance := NewRules(mockClient)
+			result, err := instance.Get()
+
+			if err != nil {
+				t.Errorf("got err %v", err)
+			}
+
+			if result.Data[0].Id != tt.result.Data[0].Id {
+				t.Errorf("got %s, want %s", result.Data[0].Id, tt.result.Data[0].Id)
+			}
+
+			if result.Data[0].Tag != tt.result.Data[0].Tag {
+				t.Errorf("got %s, want %s", result.Data[0].Tag, tt.result.Data[0].Tag)
+			}
+
+			if result.Data[0].Value != tt.result.Data[0].Value {
+				t.Errorf("got %s, want %s", result.Data[0].Value, tt.result.Data[0].Value)
+			}
+
+			if result.Meta.Summary.Created != tt.result.Meta.Summary.Created {
+				t.Errorf("got %d, want %d", result.Meta.Summary.Created, tt.result.Meta.Summary.Created)
+			}
+
+			if result.Meta.Summary.NotCreated != tt.result.Meta.Summary.NotCreated {
+				t.Errorf("got %d, want %d", result.Meta.Summary.NotCreated, tt.result.Meta.Summary.NotCreated)
+			}
+
+			if result.Meta.Sent != tt.result.Meta.Sent {
+				t.Errorf("got %s, want %s", result.Meta.Sent, tt.result.Meta.Sent)
+			}
+		})
+	}
 }
