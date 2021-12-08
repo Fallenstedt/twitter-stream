@@ -9,6 +9,7 @@ type (
 	//IRules is the interface the rules struct implements.
 	IRules interface {
 		Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleResponse, error)
+		Delete(req DeleteRulesRequest, dryRun bool) (*TwitterRuleResponse, error)
 		GetRules() (*TwitterRuleResponse, error)
 	}
 
@@ -85,23 +86,33 @@ func (t *rules) Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleRespo
 	return data, err
 }
 
+func (t *rules) Delete(req DeleteRulesRequest, dryRun bool) (*TwitterRuleResponse, error) {
 
-// GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
-func (t *rules) GetRules() (*TwitterRuleResponse, error) {
-	res, err := t.httpClient.GetRules()
+	body, err := json.Marshal(req)
 
 	if err != nil {
 		return nil, err
 	}
 
+	res, err := t.httpClient.AddRules(func() string {
+		if dryRun {
+			return "?dry_run=true"
+		} else {
+			return ""
+		}
+	}(), string(body))
+
+
 	defer res.Body.Close()
 	data := new(TwitterRuleResponse)
-	json.NewDecoder(res.Body).Decode(data)
 
-	return data, nil
+	err = json.NewDecoder(res.Body).Decode(data)
+	return data, err
 }
 
-func (t *rules) GetRulesI() (*TwitterRuleResponse, error) {
+
+// GetRules gets rules for a stream using twitter's GET GET /2/tweets/search/stream/rules endpoint.
+func (t *rules) GetRules() (*TwitterRuleResponse, error) {
 	res, err := t.httpClient.GetRules()
 
 	if err != nil {

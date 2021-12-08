@@ -19,7 +19,19 @@ type  (
 		Add []*RuleValue `json:"add"`
 	}
 
+	DeleteRulesRequest struct {
+		Delete struct {
+			Ids []int `json:"ids"`
+		} `json:"delete"`
+	}
+
 )
+
+func NewDeleteRulesRequest(ids ...int) DeleteRulesRequest {
+	return DeleteRulesRequest{Delete: struct {
+		Ids []int `json:"ids"`
+	}(struct{ Ids []int }{Ids: ids})}
+}
 
 func NewRuleBuilder() *RuleBuilder {
 	return &RuleBuilder{
