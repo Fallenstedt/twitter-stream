@@ -7,7 +7,7 @@ func main() {
 	// Run an example function
 
 	addRules()
-	//getRules()
-	//initiateStream()
+	getRules()
+	initiateStream()
 	//deleteRules()
 }

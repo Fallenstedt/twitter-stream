@@ -18,6 +18,12 @@ See [examples](https://github.com/fallenstedt/twitter-stream/tree/master/example
 `go get github.com/fallenstedt/twitter-stream`
 
 
+## Projects Using TwitterStream
+Below are projects using this library! Add yours below with a pull request.
+
+* [FindTechJobs](https://www.findtechjobs.io/) - Search latest tech job postings from around the world
+
+
 
 
 ## Examples
@@ -182,7 +188,6 @@ func initiateStream() {
     fmt.Println("Stopped Stream")
 }
 ```
-
 
 ## Contributing
 
