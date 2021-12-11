@@ -17,9 +17,6 @@ import (
 // With connections to streaming endpoints, **it is likely, and should be expected,** that disconnections will take place and reconnection logic built.
 // ~https://developer.twitter.com/en/docs/twitter-api/tweets/volume-streams/integrate/handling-disconnections
 
-const KEY = "YOUR_KEY"
-const SECRET = "YOUR_SECRET"
-
 type StreamDataExample struct {
 	Data struct {
 		Text      string    `json:"text"`
@@ -40,11 +37,7 @@ type StreamDataExample struct {
 	} `json:"matching_rules"`
 }
 
-func main2() {
-	// This will run forever
-	initiateStream()
-}
-
+// This will run forever
 func initiateStream() {
 	fmt.Println("Starting Stream")
 

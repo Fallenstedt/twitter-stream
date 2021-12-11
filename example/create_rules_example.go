@@ -6,24 +6,16 @@ import (
 	"github.com/fallenstedt/twitter-stream/rules"
 )
 
-const key = "KEY"
-const secret = "SECRET"
-
-func main() {
- 	addRules()
- 	//getRules()
- 	//deleteRules()
-}
-
 func addRules() {
 
-	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
+	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(KEY, SECRET).RequestBearerToken()
 	if err != nil {
 		panic(err)
 	}
 	api := twitterstream.NewTwitterStream(tok.AccessToken)
 	rules := twitterstream.NewRuleBuilder().
-		AddRule("puppies has:images", "puppy tweets with images").
+		AddRule("cat has:images", "cat tweets with images").
+		AddRule("puppy has:images", "puppy tweets with images").
 		AddRule("lang:en -is:retweet -is:quote (#golangjobs OR #gojobs)", "golang jobs").
 		Build()
 
@@ -38,11 +30,12 @@ func addRules() {
 		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
-	fmt.Println("I have deleted rules.")
+	fmt.Println("I have created rules.")
+	printRules(res.Data)
 }
 
 func getRules() {
-	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
+	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(KEY, SECRET).RequestBearerToken()
 	if err != nil {
 		panic(err)
 	}
@@ -68,14 +61,14 @@ func getRules() {
 }
 
 func deleteRules() {
-	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(key, secret).RequestBearerToken()
+	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret(KEY, SECRET).RequestBearerToken()
 	if err != nil {
 		panic(err)
 	}
 	api := twitterstream.NewTwitterStream(tok.AccessToken)
 
 	// use api.Rules.Get to find the ID number for an existing rule
-	res, err := api.Rules.Delete(rules.NewDeleteRulesRequest(1468427075727945728, 1468427075727945729), false)
+	res, err := api.Rules.Delete(rules.NewDeleteRulesRequest(1469776000158363653, 1469776000158363654), false)
 
 	if err != nil {
 		panic(err)
@@ -86,8 +79,7 @@ func deleteRules() {
 		panic(fmt.Sprintf("Received an error from twitter: %v", res.Errors))
 	}
 
-	fmt.Println("I have deleted these rules: ")
-	printRules(res.Data)
+	fmt.Println("I have deleted rules ")
 }
 
 
