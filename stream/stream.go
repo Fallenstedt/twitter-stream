@@ -1,4 +1,4 @@
-package twitterstream
+package stream
 
 import (
 	"github.com/fallenstedt/twitter-stream/httpclient"
@@ -36,7 +36,7 @@ type (
 	}
 )
 
-func newStream(httpClient httpclient.IHttpClient, reader IStreamResponseBodyReader) IStream {
+func NewStream(httpClient httpclient.IHttpClient, reader IStreamResponseBodyReader) IStream {
 	return &Stream{
 		unmarshalHook: func(bytes []byte) (interface{}, error) {
 			return bytes, nil

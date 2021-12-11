@@ -1,4 +1,4 @@
-package twitterstream
+package token_generator
 
 import (
 	"bytes"
@@ -68,7 +68,7 @@ func TestRequestBearerToken(t *testing.T) {
 			mockClient := httpclient.NewHttpClientMock("")
 			mockClient.MockNewHttpRequest = tt.mockRequest
 
-			instance := newTokenGenerator(mockClient)
+			instance := NewTokenGenerator(mockClient)
 			instance.SetApiKeyAndSecret("SomeKey", "SomeSecret")
 
 			data, err := instance.RequestBearerToken()

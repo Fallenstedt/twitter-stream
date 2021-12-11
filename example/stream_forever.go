@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	twitterstream "github.com/fallenstedt/twitter-stream"
+	"github.com/fallenstedt/twitter-stream/stream"
 	"time"
 )
 
@@ -15,9 +16,6 @@ import (
 // Twitter servers will hold the connection open indefinitely, barring server-side error, excessive client-side lag, network issues, routine server maintenance, or duplicate logins.
 // With connections to streaming endpoints, **it is likely, and should be expected,** that disconnections will take place and reconnection logic built.
 // ~https://developer.twitter.com/en/docs/twitter-api/tweets/volume-streams/integrate/handling-disconnections
-
-const KEY = "YOUR_KEY"
-const SECRET = "YOUR_SECRET"
 
 type StreamDataExample struct {
 	Data struct {
@@ -39,11 +37,7 @@ type StreamDataExample struct {
 	} `json:"matching_rules"`
 }
 
-func main() {
-	// This will run forever
-	initiateStream()
-}
-
+// This will run forever
 func initiateStream() {
 	fmt.Println("Starting Stream")
 
@@ -80,7 +74,7 @@ func initiateStream() {
 	fmt.Println("Stopped Stream")
 }
 
-func fetchTweets() twitterstream.IStream {
+func fetchTweets() stream.IStream {
 	tok, err := getTwitterToken()
 	if err != nil {
 		panic(err)
@@ -107,6 +101,6 @@ func getTwitterToken() (string, error) {
 	return tok.AccessToken, err
 }
 
-func getTwitterStreamApi(tok string) twitterstream.IStream {
+func getTwitterStreamApi(tok string) stream.IStream {
 	return twitterstream.NewTwitterStream(tok).Stream
 }
