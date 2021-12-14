@@ -20,9 +20,18 @@ func NewTokenGenerator() token_generator.ITokenGenerator {
 	return tokenGenerator
 }
 
+// NewRuleBuilder creates a rule builder for creating rules.
+// It is used in `rules.Create`.
 func NewRuleBuilder() rules.IRuleBuilder {
 	return rules.NewRuleBuilder()
 }
+
+// NewRuleDelete creates a delete rules request.
+// It is used in `rules.Delete`.
+func NewRuleDelete(ids ...int) rules.DeleteRulesRequest {
+	return rules.NewDeleteRulesRequest(ids...)
+}
+
 
 // NewTwitterStream consumes a twitter Bearer token.
 // It is used to interact with Twitter's v2 filtered streaming API
