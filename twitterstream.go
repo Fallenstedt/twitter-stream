@@ -32,6 +32,12 @@ func NewRuleDelete(ids ...int) rules.DeleteRulesRequest {
 	return rules.NewDeleteRulesRequest(ids...)
 }
 
+// NewStreamQueryParamsBuilder creates a stream query param builder.
+// It is used with `stream.StartStream()` to include tweets with extra metadata.
+func NewStreamQueryParamsBuilder() stream.IStreamQueryParamsBuilder {
+	return stream.NewStreamQueryParamsBuilder()
+}
+
 
 // NewTwitterStream consumes a twitter Bearer token.
 // It is used to interact with Twitter's v2 filtered streaming API
