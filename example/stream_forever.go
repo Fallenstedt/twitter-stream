@@ -88,7 +88,12 @@ func fetchTweets() stream.IStream {
 		}
 		return data, err
 	})
-	err = api.StartStream("?expansions=author_id&tweet.fields=created_at")
+	streamExpansions := twitterstream.NewStreamQueryParamsBuilder().
+		AddExpansion("author_id").
+		AddTweetField("created_at").
+		Build()
+
+	err = api.StartStream(streamExpansions)
 	if err != nil {
 		panic(err)
 	}

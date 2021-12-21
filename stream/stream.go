@@ -3,6 +3,7 @@ package stream
 import (
 	"github.com/fallenstedt/twitter-stream/httpclient"
 	"net/http"
+	"net/url"
 )
 
 type (
@@ -11,7 +12,7 @@ type (
 
 	// IStream is the interface that the stream struct implements.
 	IStream interface {
-		StartStream(queryParams string) error
+		StartStream(queryParams *url.Values) error
 		StopStream()
 		GetMessages() <-chan StreamMessage
 		SetUnmarshalHook(hook UnmarshalHook)
@@ -69,7 +70,7 @@ func (s *Stream) StopStream() {
 // Accepts query params described in GET /2/tweets/search/stream to expand the payload that is returned. Query params string must begin with a ?.
 // See available query params here https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
 // See an example here: https://developer.twitter.com/en/docs/twitter-api/expansions.
-func (s *Stream) StartStream(optionalQueryParams string) error {
+func (s *Stream) StartStream(optionalQueryParams *url.Values) error {
 	res, err := s.httpClient.GetSearchStream(optionalQueryParams)
 
 	if err != nil {

@@ -3,23 +3,27 @@ package stream
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
 type (
+	//IStreamQueryParamsBuilder is the interface for StreamQueryParamBuilder.
 	IStreamQueryParamsBuilder interface {
-		AddBackFillMinutes(minutes uint8) *StreamQueryParamBuilder
+		AddBackFillMinutes(minutes uint) *StreamQueryParamBuilder
 		AddExpansion(expansion string) *StreamQueryParamBuilder
 		AddMediaField(mediaField string) *StreamQueryParamBuilder
 		AddPlaceField(placeField string) *StreamQueryParamBuilder
 		AddPollField(pollField string) *StreamQueryParamBuilder
 		AddTweetField(tweetField string) *StreamQueryParamBuilder
 		AddUserField(userField string) *StreamQueryParamBuilder
-		Build() string
+		Build() *url.Values
 	}
 
+	// StreamQueryParamBuilder is a struct used for requesting additional data from a tweet.
+	// Read more at https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
 	StreamQueryParamBuilder struct {
-		backFillMinutes *uint8
+		backFillMinutes uint
 		expansions []*string
 		mediaFields []*string
 		placeFields []*string
@@ -32,7 +36,7 @@ type (
 
 func NewStreamQueryParamsBuilder() IStreamQueryParamsBuilder {
 	return &StreamQueryParamBuilder{
-		backFillMinutes: nil,
+		backFillMinutes: 0,
 		expansions: []*string{},
 		mediaFields: []*string{},
 		placeFields: []*string{},
@@ -42,21 +46,24 @@ func NewStreamQueryParamsBuilder() IStreamQueryParamsBuilder {
 	}
 }
 
-// TODO finish building query param string and document.
-func (s *StreamQueryParamBuilder) Build() string {
+// Build will build and encode the required query params
+func (s *StreamQueryParamBuilder) Build() *url.Values {
 	query := new(url.URL).Query()
 
-	if len(s.expansions) > 0 {
-		var sb strings.Builder
-		for _, expansion := range s.expansions {
-			sb.WriteString(fmt.Sprintf("%v,", expansion))
-		}
-		value := sb.String()
-		query.Add("expansions", value)
+	s.addQuery(&query, &s.expansions, "expansions")
+	s.addQuery(&query, &s.mediaFields, "media.fields")
+	s.addQuery(&query, &s.placeFields, "place.fields")
+	s.addQuery(&query, &s.pollFields, "poll.fields")
+	s.addQuery(&query, &s.tweetFields, "tweet.fields")
+	s.addQuery(&query, &s.userFields, "user.fields")
+
+	if s.backFillMinutes > 0 {
+		query.Add("backfill_minutes", strconv.Itoa(int(s.backFillMinutes)))
 	}
 
-	return query.Encode()
+	return &query
 }
+
 
 // AddExpansion adds an expansion defined in https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
 // With expansions, developers can expand objects referenced in the payload. Objects available for expansion are referenced by ID.
@@ -120,7 +127,22 @@ func (s *StreamQueryParamBuilder) AddUserField(userField string) *StreamQueryPar
 // AddBackFillMinutes will allow you to recover up to 5 minutes worth of data that might have been missed during a disconnection.
 // This feature is currently only available to the academic research product track!
 // Learn more about media fields on twitter docs https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
-func (s *StreamQueryParamBuilder) AddBackFillMinutes(backFillMinutes uint8) *StreamQueryParamBuilder {
-	s.backFillMinutes = &backFillMinutes
+func (s *StreamQueryParamBuilder) AddBackFillMinutes(backFillMinutes uint) *StreamQueryParamBuilder {
+	s.backFillMinutes = backFillMinutes
 	return s
+}
+
+func (s StreamQueryParamBuilder) addQuery(qb *url.Values, fields *[]*string, param string) {
+	if len(*fields) > 0 {
+		var sb strings.Builder
+		for i, expansion := range *fields {
+			if i == len(*fields) - 1 {
+				sb.WriteString(fmt.Sprintf("%v", *expansion))
+			} else {
+				sb.WriteString(fmt.Sprintf("%v,", *expansion))
+			}
+		}
+		value := sb.String()
+		qb.Add(param, value)
+	}
 }
