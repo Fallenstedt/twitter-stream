@@ -75,12 +75,16 @@ func initiateStream() {
 }
 
 func fetchTweets() stream.IStream {
+	// Get Bearer Token using API keys
 	tok, err := getTwitterToken()
 	if err != nil {
 		panic(err)
 	}
 
+	// Instantiate an instance of twitter stream using the bearer token
 	api := getTwitterStreamApi(tok)
+
+	// On Each tweet, decode the bytes into a StreamDataExample struct
 	api.SetUnmarshalHook(func(bytes []byte) (interface{}, error) {
 		data := StreamDataExample{}
 		if err := json.Unmarshal(bytes, &data); err != nil {
@@ -88,11 +92,20 @@ func fetchTweets() stream.IStream {
 		}
 		return data, err
 	})
-	err = api.StartStream("?expansions=author_id&tweet.fields=created_at")
+
+	// Request additional data from teach tweet
+	streamExpansions := twitterstream.NewStreamQueryParamsBuilder().
+		AddExpansion("author_id").
+		AddTweetField("created_at").
+		Build()
+
+	// Start the Stream
+	err = api.StartStream(streamExpansions)
 	if err != nil {
 		panic(err)
 	}
 
+	// Return the twitter stream api instance
 	return api
 }
 

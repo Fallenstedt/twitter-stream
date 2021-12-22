@@ -68,7 +68,7 @@ func deleteRules() {
 	api := twitterstream.NewTwitterStream(tok.AccessToken)
 
 	// use api.Rules.Get to find the ID number for an existing rule
-	res, err := api.Rules.Delete(rules.NewDeleteRulesRequest(1469776000158363653, 1469776000158363654), false)
+	res, err := api.Rules.Delete(rules.NewDeleteRulesRequest(1469777072675450881, 74893274932), false)
 
 	if err != nil {
 		panic(err)
