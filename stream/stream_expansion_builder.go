@@ -34,6 +34,9 @@ type (
 
 )
 
+// NewStreamQueryParamsBuilder creeates a struct that implements IStreamQueryParamsBuilder.
+// It is used to request additional data from a tweet.
+// Read more at https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream.
 func NewStreamQueryParamsBuilder() IStreamQueryParamsBuilder {
 	return &StreamQueryParamBuilder{
 		backFillMinutes: 0,
@@ -46,7 +49,7 @@ func NewStreamQueryParamsBuilder() IStreamQueryParamsBuilder {
 	}
 }
 
-// Build will build and encode the required query params
+// Build will build and encode the required query params.
 func (s *StreamQueryParamBuilder) Build() *url.Values {
 	query := new(url.URL).Query()
 

@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"testing"
 )
 
@@ -52,7 +53,7 @@ func TestStartStream(t *testing.T) {
 		{
 			func() httpclient.IHttpClient {
 				mockClient := httpclient.NewHttpClientMock("foobar")
-				mockClient.MockGetSearchStream = func(queryParams string) (*http.Response, error) {
+				mockClient.MockGetSearchStream = func(queryParams *url.Values) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
 						Body:       ioutil.NopCloser(bytes.NewReader([]byte("hello"))),
@@ -84,7 +85,7 @@ func TestStartStream(t *testing.T) {
 				tt.givenMockStreamResponseBodyReader(),
 			)
 
-			err := instance.StartStream("")
+			err := instance.StartStream(nil)
 			if err != nil {
 				t.Errorf("got err when starting stream %v", err)
 			}

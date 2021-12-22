@@ -6,6 +6,7 @@ import (
 	"github.com/fallenstedt/twitter-stream/httpclient"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"testing"
 )
 
@@ -13,12 +14,12 @@ func TestCreate(t *testing.T) {
 
 	var tests = []struct {
 		body        CreateRulesRequest
-		mockRequest func(queryParams string, body string) (*http.Response, error)
+		mockRequest func(queryParams *url.Values, body string) (*http.Response, error)
 		result      *TwitterRuleResponse
 	}{
 		{
 			NewRuleBuilder().AddRule("cat has:images", "cat tweets with images").Build(),
-			func(queryParams string, bodyRequest string) (*http.Response, error) {
+			func(queryParams *url.Values, bodyRequest string) (*http.Response, error) {
 				json := `{
 					"data": [{
 						"Value": "cat has:images", 
@@ -108,12 +109,12 @@ func TestDelete(t *testing.T) {
 
 	var tests = []struct {
 		body        DeleteRulesRequest
-		mockRequest func(queryParams string, body string) (*http.Response, error)
+		mockRequest func(queryParams *url.Values, body string) (*http.Response, error)
 		result      *TwitterRuleResponse
 	}{
 		{
 			NewDeleteRulesRequest(123),
-			func(queryParams string, bodyRequest string) (*http.Response, error) {
+			func(queryParams *url.Values, bodyRequest string) (*http.Response, error) {
 				json := `{
 					"data": [{
 						"Value": "cat has:images", 
