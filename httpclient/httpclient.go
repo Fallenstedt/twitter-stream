@@ -3,8 +3,10 @@ package httpclient
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -18,9 +20,9 @@ type (
 	IHttpClient interface {
 		NewHttpRequest(opts *RequestOpts) (*http.Response, error)
 		GetRules() (*http.Response, error)
-		GetSearchStream(queryParams string) (*http.Response, error)
-		AddRules(queryParams string, body string) (*http.Response, error)
-		GenerateUrl(name string, queryParams string) (string, error)
+		GetSearchStream(queryParams *url.Values) (*http.Response, error)
+		AddRules(queryParams *url.Values, body string) (*http.Response, error)
+		GenerateUrl(name string, queryParams *url.Values) (string, error)
 	}
 
 	httpClient struct {
@@ -48,7 +50,7 @@ func (t *httpClient) GetRules() (*http.Response, error) {
 }
 
 // AddRules will add rules for you to stream with.
-func (t *httpClient) AddRules(queryParams string, body string) (*http.Response, error) {
+func (t *httpClient) AddRules(queryParams *url.Values, body string) (*http.Response, error) {
 	url, err := t.GenerateUrl("rules", queryParams)
 
 	if err != nil {
@@ -69,7 +71,7 @@ func (t *httpClient) AddRules(queryParams string, body string) (*http.Response, 
 }
 
 // GetSearchStream will start the stream with twitter.
-func (t *httpClient) GetSearchStream(queryParams string) (*http.Response, error) {
+func (t *httpClient) GetSearchStream(queryParams *url.Values) (*http.Response, error) {
 	// Make an HTTP GET request to GET /2/tweets/search/stream
 	url, err := t.GenerateUrl("stream", queryParams)
 
@@ -90,10 +92,10 @@ func (t *httpClient) GetSearchStream(queryParams string) (*http.Response, error)
 }
 
 // GenerateUrl is a utility function for httpclient package to generate a valid url for api.twitter.
-func (t *httpClient) GenerateUrl(name string, queryParams string) (string, error) {
+func (t *httpClient) GenerateUrl(name string, queryParams *url.Values) (string, error) {
 	var url string
-	if len(queryParams) > 0 {
-		url = Endpoints[name] + queryParams
+	if queryParams != nil {
+		url = Endpoints[name] + fmt.Sprintf("?%v", queryParams.Encode())
 	} else {
 		url = Endpoints[name]
 	}

@@ -118,8 +118,8 @@ api.SetUnmarshalHook(func(bytes []byte) (interface{}, error) {
 
 ##### Start Stream
 Start your stream. This is a long-running HTTP GET request. 
-You can get specific data you want by adding [query params](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream).
-Additionally, [view an example of query params here](https://developer.twitter.com/en/docs/twitter-api/expansions), or in the [examples](https://github.com/fallenstedt/twitter-stream/tree/master/example)
+You can request additional tweet data by adding [query params](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream).
+Use the `twitterstream.NewStreamQueryParamsBuilder()` to start a stream with the data you want. 
 
 ```go
 
@@ -142,7 +142,15 @@ func fetchTweets() stream.IStream {
         }
         return data, err
     })
-    err = api.StartStream("?expansions=author_id&tweet.fields=created_at")
+    
+    // https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/api-reference/get-tweets-search-stream
+    streamExpansions := twitterstream.NewStreamQueryParamsBuilder().
+        AddExpansion("author_id").
+        AddTweetField("created_at").
+        Build()
+    
+    // StartStream will start the stream 
+    err = api.StartStream(streamExpansions)
     
     if err != nil {
         panic(err)
@@ -162,7 +170,7 @@ func initiateStream() {
     // When the loop below ends, restart the stream
     defer initiateStream()
     
-    // Start processing data from twitter
+    // Start processing data from twitter after starting the stream
     for tweet := range api.GetMessages() {
     
         // Handle disconnections from twitter

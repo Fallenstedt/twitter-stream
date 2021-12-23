@@ -3,6 +3,7 @@ package rules
 import (
 	"encoding/json"
 	"github.com/fallenstedt/twitter-stream/httpclient"
+	"net/url"
 )
 
 type (
@@ -68,13 +69,7 @@ func (t *rules) Create(rules CreateRulesRequest, dryRun bool) (*TwitterRuleRespo
 		return nil, err
 	}
 
-	res, err := t.httpClient.AddRules(func() string {
-		if dryRun {
-			return "?dry_run=true"
-		} else {
-			return ""
-		}
-	}(), string(body))
+	res, err := t.httpClient.AddRules(t.addDryRun(dryRun), string(body))
 
 	if err != nil {
 		return nil, err
@@ -95,13 +90,7 @@ func (t *rules) Delete(req DeleteRulesRequest, dryRun bool) (*TwitterRuleRespons
 		return nil, err
 	}
 
-	res, err := t.httpClient.AddRules(func() string {
-		if dryRun {
-			return "?dry_run=true"
-		} else {
-			return ""
-		}
-	}(), string(body))
+	res, err := t.httpClient.AddRules(t.addDryRun(dryRun), string(body))
 
 
 	defer res.Body.Close()
@@ -127,3 +116,14 @@ func (t *rules) Get() (*TwitterRuleResponse, error) {
 	return data, nil
 }
 
+
+
+func (t *rules) addDryRun(dryRun bool) *url.Values {
+	if dryRun {
+		query := new(url.URL).Query()
+		query.Add("dry_run", "true")
+		return &query
+	} else {
+		return nil
+	}
+}
