@@ -1,24 +1,30 @@
 package rules
 
 type  (
+	// IRuleBuilder is an interface that describers how to implement a RuleBuilder.
 	IRuleBuilder interface {
 		AddRule(value string, tag string) *RuleBuilder
 		Build() CreateRulesRequest
 	}
 
+	// RuleValue is a struct used to help create twitter stream rules.
+	// It takes in a value and a tag.
 	RuleValue struct {
 		Value *string `json:"value,omitempty"`
 		Tag   *string `json:"tag,omitempty"`
 	}
 
+	// RuleBuilder is struct used to help create twitter stream rules.
 	RuleBuilder struct {
 		rules []*RuleValue
 	}
 
+	// CreateRulesRequest is a struct used to create the payload for creating rules.
 	CreateRulesRequest struct {
 		Add []*RuleValue `json:"add"`
 	}
 
+	// DeleteRulesRequest is a struct used to create the payload for deleting rules.
 	DeleteRulesRequest struct {
 		Delete struct {
 			Ids []int `json:"ids"`
@@ -27,12 +33,14 @@ type  (
 
 )
 
+// NewDeleteRulesRequest will create an instance of DeleteRulesRequest.
 func NewDeleteRulesRequest(ids ...int) DeleteRulesRequest {
 	return DeleteRulesRequest{Delete: struct {
 		Ids []int `json:"ids"`
 	}(struct{ Ids []int }{Ids: ids})}
 }
 
+// NewRuleBuilder will create an instance of `RuleBuilder`.
 func NewRuleBuilder() *RuleBuilder {
 	return &RuleBuilder{
 		rules: []*RuleValue{},
@@ -64,4 +72,3 @@ func (r *RuleValue) setValueTag(value string, tag string) *RuleValue {
 	r.Tag = &tag
 	return r
 }
-

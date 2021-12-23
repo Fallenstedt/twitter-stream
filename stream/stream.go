@@ -37,6 +37,7 @@ type (
 	}
 )
 
+// NewStream creates an instance of `Stream`. This is used to manage the stream with Twitter.
 func NewStream(httpClient httpclient.IHttpClient, reader IStreamResponseBodyReader) IStream {
 	return &Stream{
 		unmarshalHook: func(bytes []byte) (interface{}, error) {
