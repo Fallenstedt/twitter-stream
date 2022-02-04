@@ -27,7 +27,7 @@ See [examples](https://github.com/fallenstedt/twitter-stream/tree/master/example
 ##### Obtain an Access Token using your Twitter Access Key and Secret.
 
 You need an access token to do any streaming. `twitterstream` provides an easy way to fetch an access token. Use your
-access token and secret access token from twitter to request a bearer token.
+API key and secret API key from twitter to request an access token.
 
 ```go
 	tok, err := twitterstream.NewTokenGenerator().SetApiKeyAndSecret("key", "secret").RequestBearerToken()
