@@ -92,6 +92,9 @@ func (t *rules) Delete(req DeleteRulesRequest, dryRun bool) (*TwitterRuleRespons
 
 	res, err := t.httpClient.AddRules(t.addDryRun(dryRun), string(body))
 
+	if err != nil {
+		return nil, err
+	}
 
 	defer res.Body.Close()
 	data := new(TwitterRuleResponse)
