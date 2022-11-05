@@ -6,6 +6,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/fallenstedt/twitter-stream)](https://goreportcard.com/report/github.com/fallenstedt/twitter-stream)
 [![Go Reference](https://pkg.go.dev/badge/github.com/fallenstedt/twitter-stream.svg)](https://pkg.go.dev/github.com/fallenstedt/twitter-stream)
 
+
+>  ⚠️ This repo is read-only and is no longer worked on. Twitter was a wonderful platform, built by a wonderful team. With its recent changes, its time to re-evaluate what we invest in and the world we want to build. To the projects using this library, I'll leave the repo read-only so you can migrate. on your own time
+
+
 TwitterStream is a Go library for creating streaming rules and streaming tweets with [Twitter's v2 Filtered Streaming API](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/introduction).
 
 - See [my blog post](https://www.fallenstedt.com/blog/twitter-stream/) for a tutorial on Twitter's Filtered Stream endpoint.
